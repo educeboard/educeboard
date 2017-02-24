@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3de623e7a97274b55979aa07602dc055
+timeCreated: 1457662211
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - male: {fileID: 100002, guid: ceb031dc6819240a1860f985f8955738, type: 3}
+  - female: {fileID: 100012, guid: 09fecc2837a564d008a440f8d66f75cb, type: 3}
+  - teacher: {fileID: 100010, guid: af731a900a669f442a56385d533e1808, type: 2}
+  - desk: {fileID: 100000, guid: 3e016fcf598f9a44ea83c6babde0b831, type: 2}
+  - testobj: {fileID: 169410, guid: 48c91e13489b242c8856ac95f43c6c02, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
