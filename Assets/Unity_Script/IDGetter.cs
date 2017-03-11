@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement; 
 
 public class IDGetter : MonoBehaviour {
 
@@ -9,7 +10,6 @@ public class IDGetter : MonoBehaviour {
 	void Start () {
 		sid = null;
 		tid = null;
-		Application.ExternalCall ("UnityLoadFlag", 1);
 	}
 	
 	// Update is called once per frame
@@ -17,8 +17,9 @@ public class IDGetter : MonoBehaviour {
 		GetComponent<GUIText>().text = "sid:"+sid+"\ntid:"+tid;
 //		Debug.Log (!string.IsNullOrEmpty (sid)+"||"+!string.IsNullOrEmpty (tid));
 		if (string.IsNullOrEmpty (sid) == false && string.IsNullOrEmpty (tid) == false){
-			Debug.Log(sid+","+tid);
-			Application.LoadLevel ("EduceBoard");
+			InitCall ();
+//			Debug.Log(sid+","+tid);
+
 		}
 
 		//デバッグ用,Aキーを押したらsid300,tid1を入れる
@@ -37,6 +38,14 @@ public class IDGetter : MonoBehaviour {
 			tid ="1";
 		}
 
+	}
+
+	void InitCall()
+	{
+		if (sid != null && tid != null) {
+			Application.ExternalCall ("UnityLoadFlag", 1);
+			SceneManager.LoadScene("EduceBoard");
+		}
 	}
 
 	void GetSID(string getSID){

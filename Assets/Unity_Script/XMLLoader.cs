@@ -8,8 +8,10 @@ using MiniJSON;
 using UnityEngine.UI;
 using System;
 using System.Runtime.Serialization;
+using UnityEngine.SceneManagement; 
 
 public class XMLLoader : MonoBehaviour {
+	#region 読み込み関連
 	string sid;
 	string tid;
 	string xmlid = "2";//XMLを読み込むなら1(現在非対応)、JSONを読み込むなら2
@@ -17,16 +19,18 @@ public class XMLLoader : MonoBehaviour {
 	string XMLFilePath = null;
 	WWW getXML;
 	public bool XMLHasLoad = false;
-	
-	//DataListは全アクターの位置情報のリストを保持する二重リスト
-	//actorListは各アクターの時間毎の座標・方向情報を保持するリスト
+
+	//読み込んだデータ
+	///<summary>全アクターの位置情報のリストを保持する二重リスト</summary>
 	List<List<LocationData>> DataList = new List<List<LocationData>>();
+	///<summary>各アクターの時間毎の座標・方向情報を保持するリスト</summary>
 	List<GameObject> actorList = new List<GameObject>();
 
-
 	Dictionary <string, int> midDic = new Dictionary<string, int> ();
-	Dictionary <GameObject,Vector3> posDic = new Dictionary<GameObject, Vector3> ();
+//	Dictionary <GameObject,Vector3> posDic = new Dictionary<GameObject, Vector3> ();
+	#endregion
 
+	#region モデル関連
 	public GameObject male;
 	public GameObject female;
 	public GameObject teacher;
@@ -40,21 +44,37 @@ public class XMLLoader : MonoBehaviour {
 	const string MODEL_DESK = "desk";
 
 	const int MID_CHECK_SKIP_COUNT = 10;
+	#endregion
+
+	#region 状態管理
+	public enum STEP
+	{
+		NONE 	= 0,
+		LOAD 	= 1,
+		READY	= 2,
+		PLAY	= 3,
+		PAUSE	= 4,
+	}
 
 	public float time = 0.1f;
 	float audioTime =0;
 
 	VoiceLoader voiceLoader;
 
-	[SerializeField] int isStart = 0;
-	[SerializeField] int isPlay = 0;
-	[SerializeField] bool readiness = false;
+	STEP step = STEP.NONE;
 
+//	[SerializeField] int isStart = 0;
+//	[SerializeField] int isPlay = 0;
+//	[SerializeField] bool readiness = false;
+	#endregion
 
 	void Start () {
 
 		if (string.IsNullOrEmpty (IDGetter.sid) || string.IsNullOrEmpty (IDGetter.tid)) {
-			GetComponent<GUIText>().text = "ID error";
+			Debug.Log ("<color=red>[ID Error]:sid or tid is null. move to LoadScene</color>");
+			SceneManager.LoadScene("LoadScene");
+//			GetComponent<GUIText>().text = "ID error";
+			return;
 
 		} else {
 			sid = IDGetter.sid;
@@ -66,7 +86,6 @@ public class XMLLoader : MonoBehaviour {
 		//ダウンロード先のJSONのパス
 		XMLFilePath = "http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/readMarkersLocator2.php?session_id="+sid+"&tid="+tid+"&xml="+xmlid;
 		//XMLFilePath = Application.dataPath + "/XML"+"/readMarkersLocator.php.xml"; //local
-		Debug.Log(XMLFilePath);
 		//Debug.Log("XMLFilePath is :" + XMLFilePath);
 
 		StartCoroutine("Load");
@@ -77,22 +96,24 @@ public class XMLLoader : MonoBehaviour {
 	//位置情報をロードする関数
 	private IEnumerator Load()
 	{
-		Debug.Log("ロードスタートしました");
+		step = STEP.LOAD;
+		Debug.Log("<color=blue>Load Start</color>");
 		getXML = new WWW (XMLFilePath);
-		Debug.Log (getXML);
-		Debug.Log (XMLFilePath);
+		Debug.Log("<color=blue>"+XMLFilePath+"</color>");
 //		GetComponent<GUIText>().text = "Loading...";
 		yield return getXML;
 
 		if (!string.IsNullOrEmpty (getXML.error)) {
 			Debug.Log (getXML);
-			Debug.Log("XML error");
+			Debug.Log("<color=red>XML error</color>");
 			Application.ExternalCall("xmlLoadFlag",-1);
-			Application.LoadLevel("LoadScene");
+			SceneManager.LoadScene("LoadScene");
 		}
 
-		Debug.Log("ロード完了しました"+getXML.text);
+
+		#region parse data
 		//データをパースする
+		Debug.Log("<color=blue>Parse Start</color>");
 		string json = getXML.text;
         IList familyList = (IList)Json.Deserialize(json);
         foreach(IDictionary person in familyList){
@@ -112,7 +133,7 @@ public class XMLLoader : MonoBehaviour {
 				if (mid - 1000 >= DataList.Count) {
 					DataList.Add (new List<LocationData> ());
 				} else {
-					Debug.Log ("datalistの長さ" + DataList.Count);
+//					Debug.Log ("datalistの長さ" + DataList.Count);
 					DataList [mid - 1001].Add (new LocationData (mid, ts, posx, posy, col, dirx));
 				}
 			} else {
@@ -132,15 +153,21 @@ public class XMLLoader : MonoBehaviour {
 				}
 			}
 		}*/
+		Debug.Log("<color=blue>Parse Complete</color>");
+		#endregion
+
+
+		#region create 3d objects
+		Debug.Log("<color=blue>Create 3d Objects</color>");
         /*3Dオブジェクトの作成*/
 		foreach (List<LocationData> List in DataList) {
-			Debug.Log (List.Count);
+//			Debug.Log (List.Count);
 			GameObject actor;
 			if(1 <= List.Count){
 				Vector3 pos    = new Vector3(List[0].posx,(float)0.3,List[0].posy);
 				Quaternion dir = Quaternion.Euler(0,List[0].dirx,0);
 				Vector3 tpos = new Vector3(List[0].posx,(float)1,List[0].posy);
-				Debug.LogWarning("mid"+List[0].mid+" is "+Who(List[0].mid));
+//				Debug.LogWarning("mid"+List[0].mid+" is "+Who(List[0].mid));
 				if (midDic ["mid" + List [0].mid] > MID_CHECK_SKIP_COUNT) {
 					switch (Who (List [0].mid)) {
 					case "male":
@@ -175,6 +202,9 @@ public class XMLLoader : MonoBehaviour {
 			}
 			
 		}
+		Debug.Log("<color=blue>Copmlete Create 3d Objects</color>");
+		#endregion
+
 		XMLHasLoad = true;
 		Application.ExternalCall("xmlLoadFlag",1);
 		time = 0;
@@ -183,52 +213,67 @@ public class XMLLoader : MonoBehaviour {
 
 
 	void Update () {
-		if (XMLHasLoad == false) {
-			Application.ExternalCall("xmlProgress",getXML.progress);
-		}
-		if(voiceLoader.hasLoad == false){
-			Application.ExternalCall("voiceProgress",voiceLoader.www.progress);
-		}
+		
 
-		time -= Time.deltaTime;
-		audioTime = voiceLoader.GetComponent<AudioSource>().time;
-
-		if(time<=0){
-			Application.ExternalCall("soundPosition",voiceLoader.source.time);
-			//time = 0.5f;
-			time = 0.1f;
-		}
-		if(readiness){
-			if(Input.GetKeyDown(KeyCode.Space)){
-				if(isStart ==0){
-					playFlag(1);
-				}else{
-					playFlag(0);
-				}
+		switch(step)
+		{
+		case STEP.NONE:
+			return;
+		case STEP.LOAD:
+			if (XMLHasLoad == false) {
+				Application.ExternalCall ("xmlProgress", getXML.progress);
 			}
+			if (voiceLoader.hasLoad == false) {
+				Application.ExternalCall ("voiceProgress", voiceLoader.www.progress);
+			}
+			
+			if (voiceLoader.hasLoad && XMLHasLoad) {
+				step = STEP.READY;
+			}
+			break;
+		case STEP.READY:
+				if (Input.GetKeyDown (KeyCode.Space)) {
+				playFlag (1);
+				}
+			break;
+		case STEP.PLAY:
+			time -= Time.deltaTime;
+			audioTime = voiceLoader.GetComponent<AudioSource>().time;
+
+			if(time<=0){
+				Application.ExternalCall("soundPosition",voiceLoader.source.time);
+				//time = 0.5f;
+				time = 0.1f;
+			}
+			if (Input.GetKeyDown (KeyCode.Space)) {
+				playFlag (0);
+			}
+			break;
+		case STEP.PAUSE:
+			break;
+
+//			if(isStart==0 && isPlay==1){
+//				isPlay = 0;
+//				voiceLoader.GetComponent<AudioSource>().Pause();
+//				audioTime =voiceLoader.GetComponent<AudioSource>().time;
+//				//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
+//			}
 		}
-		if(voiceLoader.hasLoad && XMLHasLoad && isStart==0){
-			readiness = true;
-//			GetComponent<GUIText>().text = "Press play button";
-		}
-		if(isStart==0 && isPlay==1){
-			isPlay = 0;
-			voiceLoader.GetComponent<AudioSource>().Pause();
-			audioTime =voiceLoader.GetComponent<AudioSource>().time;
-			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
-		}
+		Debug.Log (step);
 		//Debug.Log("音声ロード進捗 = "+voiceLoader.www.progress+", XMLロード進捗 = "+getXML.progress+", 再生中か = "+(isStart==0)+"データリストの長さ："+DataList.Count);
 	}
 
 	void playFlag(int flag){
-		isStart = flag;
+//		isStart = flag;
 		if (flag == 1) {
-			isPlay = 1;
+			step = STEP.PLAY;
+//			isPlay = 1;
 //			GetComponent<GUIText>().text = "Now playing";
 			voiceLoader.GetComponent<AudioSource>().time = audioTime;
 			voiceLoader.GetComponent<AudioSource>().Play ();
 		}else if(flag ==0){
-			isPlay = 0;
+//			isPlay = 0;
+			step = STEP.PAUSE;
 			voiceLoader.GetComponent<AudioSource>().Pause();
 			audioTime =voiceLoader.GetComponent<AudioSource>().time;
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
@@ -244,8 +289,7 @@ public class XMLLoader : MonoBehaviour {
 		voiceLoader.GetComponent<AudioSource>().volume = val;
 	}
 
-
-
+	#region reloacate
 	//audiotimeと0.03秒以下の誤差のLocationDataがあればそれを、なければnullを返します。
 	private LocationData getActorLocation(List<LocationData> tempList){
 		foreach (LocationData Data in tempList){
@@ -298,9 +342,9 @@ public class XMLLoader : MonoBehaviour {
 //					}
 				}*/
 
-				float movex = Data.posx - actor.transform.position.x;
-				float movez = Data.posy - actor.transform.position.z;
-				float diry = Data.dirx - actor.transform.rotation.y;
+//				float movex = Data.posx - actor.transform.position.x;
+//				float movez = Data.posy - actor.transform.position.z;
+//				float diry = Data.dirx - actor.transform.rotation.y;
 //				actor.transform.Translate(movex,0,movez,Space.World);
 					var finpos = new Vector3 (Data.posx, actor.transform.position.y, Data.posy);
 //				actor.transform.position = Vector3.Lerp (actor.transform.position, finpos,Time.deltaTime);
@@ -310,7 +354,7 @@ public class XMLLoader : MonoBehaviour {
 
 
 					actor.transform.position = Vector3.Lerp (actor.transform.position, finpos,0.7f);
-					var rot = Quaternion.Euler(0,Data.dirx , 0);
+//					var rot = Quaternion.Euler(0,Data.dirx , 0);
 				tmpdir.y = Data.dirx;
 //					actor.transform.rotation = Quaternion.Slerp (actor.transform.rotation, rot, 0.5f);
 						actor.transform.eulerAngles = tmpdir;
@@ -324,7 +368,7 @@ public class XMLLoader : MonoBehaviour {
 
 	//アクターのmidから男子生徒、女子生徒、教師、机のどれかを判断します。
 	string Who(int mid){
-		Debug.Log (mid);
+//		Debug.Log (mid);
 		string who = "";
 		if (mid >= 1000)
 			mid -= 1000;
@@ -364,6 +408,7 @@ public class XMLLoader : MonoBehaviour {
 		}
 		return who;
 	}
+	#endregion
 }
 
 

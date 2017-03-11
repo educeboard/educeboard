@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement; 
 
 public class VoiceLoader : MonoBehaviour {
 	public bool hasLoad = false;
@@ -20,7 +21,8 @@ public class VoiceLoader : MonoBehaviour {
 	}
 	private IEnumerator Load()
 	{
-
+		if (sid == null || tid == null)
+			yield return null;
 		//WWW www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/300_1.mp3");
 		www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".ogg");
 		Debug.Log ("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".ogg");
@@ -30,7 +32,7 @@ public class VoiceLoader : MonoBehaviour {
 			Debug.LogWarning (www.error.ToString());
 			Debug.Log("voice error");
 			Application.ExternalCall("xmlLoadFlag",-1);
-			Application.LoadLevel("LoadScene");
+			SceneManager.LoadScene("LoadScene");
 		}
 		source.clip = www.GetAudioClip();
 
