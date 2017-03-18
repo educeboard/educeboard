@@ -165,7 +165,9 @@
 		</footer>
 	</div>
 	<!-- <script src="http://webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/UnityObject.js"></script> -->
-	<script src="./js/UnityObject2.js"></script>
+	<!-- <script src="./js/UnityObject2.js"></script> -->
+	<script src="./unity/TemplateData/UnityProgress.js"></script>
+	<script src="./unity/Build/UnityLoader.js"></script>
 	<script src="./js/jquery-1.11.1.min.js"></script>
 	<script src="./js/pullDown.js"></script>
 	<script src="./js/libDialog.js"></script>
@@ -176,13 +178,13 @@
 	<script src="./js/commentSyncScroll.js"></script>
 	<script>
 
-		var config = {
-			width: 540,
-			height: 405,
-			enableUnityAnalytics: false,
-			enableGoogleAnalytics: false,
-			params: { enableDebugging:"0" }
-		}
+		// var config = {
+		// 	width: 540,
+		// 	height: 405,
+		// 	enableUnityAnalytics: false,
+		// 	enableGoogleAnalytics: false,
+		// 	params: { enableDebugging:"0" }
+		// }
 
 		// unityObject = new UnityObject2(config);
 
@@ -207,26 +209,12 @@
 			}
 		});
 
-		$('[data-unitySyncData]').unitySyncData({
-			unityObject:unityObject
-			,afterTimeAppend:function(){
-				$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
-			}
-			,afterRecieveXMLLoadedFlag:function(){
-				$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
-			}
-			,resultTimePosition:function(){
-				$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
-			}
-		});
-
 		$('[data-libDialog]').libDialog({
 			setEvent:false
 			,overlayAnotherAttr : 'data-educeboardDataLoad-parts="logout"'
 		});
 
 		$('[data-educeboardDataLoad]').educeboardDataLoad({
-			// unityObject:unityObject
 			// ,courseURL:
 			courseLoaded:function(){
 				$('#coursePulldownButton[data-pullDown]').pullDown();
@@ -238,6 +226,19 @@
 				$('[data-educeboardDataLoad]').educeboardDataLoad('simulationRemove');
 			}
 			,authSuccess:function(){
+
+				$('[data-unitySyncData]').unitySyncData({
+					// unityObject:unityObject
+					afterTimeAppend:function(){
+						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+					}
+					,afterRecieveXMLLoadedFlag:function(){
+						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+					}
+					,resultTimePosition:function(){
+						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+					}
+				});
 
 			}
 			,authFail:function(){

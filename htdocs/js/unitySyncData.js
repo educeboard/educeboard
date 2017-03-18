@@ -22,7 +22,7 @@ unitySendData
 
 				// オプションをセット
 				$(this).data(namespace, $.extend(true, {
-					unityObject:null
+					unityObject:UnityLoader.instantiate("unityPlayer", "./unity/Build/educetest.json", {onProgress: UnityProgress})
 					,$IDDOM:$(this).find('[data-' + namespace + '-parts="sendID"]')
 					,$seekbar:$(this).find('[data-' + namespace + '-parts="seekbar"]')
 					,$timeLength:$(this).find('[data-' + namespace + '-parts="timeLength"]')
@@ -101,7 +101,7 @@ unitySendData
 
 			console.log(options);
 
-			unityObject.initPlugin($('#unityPlayer')[0],options.unityPath);
+			// unityObject.initPlugin($('#unityPlayer')[0],options.unityPath);
 
 
 			//untiyが実行する、unity自体が読み込まれたことを通知する関数をセット
@@ -112,10 +112,10 @@ unitySendData
 				}
 				else{
 					//unityが読み込まれていて、かつ、すでにIDが決まっていた時は、この関数がIDを送信する
-					options.unityObject.getUnity().SendMessage("Loader", "GetSID", options.id.sessionId);
-					options.unityObject.getUnity().SendMessage("Loader", "GetTID", options.id.trialId);
+					options.unityObject.sendMessage("Loader", "GetSID", options.id.sessionId);
+					options.unityObject.sendMessage("Loader", "GetTID", options.id.trialId);
 					//音も送る（この場所じゃないほうがいい）
-					options.unityObject.getUnity().SendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
+					options.unityObject.sendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
 				}
 			}
 
@@ -135,10 +135,6 @@ unitySendData
 			var $this = $(this)
 			,options = $this.data(namespace);
 
-			// console.log(educeboardBasicInfo);
-
-			// options.unityObject.getUnity().SendMessage("Loader", "GetSID", options.id.sessionId);
-			// options.unityObject.getUnity().SendMessage("Loader", "GetTID", options.id.trialId);
 
 			$this.on('click.' + namespace, options.$IDDOM.selector,function(e){
 				options.id = $(e.target).data().id;
@@ -154,10 +150,10 @@ unitySendData
 
 				//sendFlagがtrueになっていなかったら、まだunityが読み込まれていないためIDは送信しない
 				if(options.sendFlag){
-					options.unityObject.getUnity().SendMessage("Loader", "GetSID", options.id.sessionId);
-					options.unityObject.getUnity().SendMessage("Loader", "GetTID", options.id.trialId);
+					options.unityObject.sendMessage("Loader", "GetSID", options.id.sessionId);
+					options.unityObject.sendMessage("Loader", "GetTID", options.id.trialId);
 					//音も送る（この場所じゃないほうがいい）
-					options.unityObject.getUnity().SendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
+					options.unityObject.sendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
 				}
 
 
@@ -257,7 +253,7 @@ unitySendData
 			console.log(resultTime);
 
 
-			options.unityObject.getUnity().SendMessage("XMLLoader", "soundPosition", resultTime);
+			options.unityObject.sendMessage("XMLLoader", "soundPosition", resultTime);
 
 			methods.applyCallback.apply([$this,'resultTimePosition']);
 
@@ -293,7 +289,7 @@ unitySendData
 			// $volumePosition.css('left', volumeLength - volumePositionWidth * .5);
 			// $volumeLength.css('width', volumeLength);
 
-			options.unityObject.getUnity().SendMessage("XMLLoader", "SetSoundValue", percent);
+			options.unityObject.sendMessage("XMLLoader", "SetSoundValue", percent);
 			options.volumeValue = percent;
 
 
@@ -592,7 +588,7 @@ unitySendData
 			}
 
 
-			options.unityObject.getUnity().SendMessage("XMLLoader","playFlag",options.isPlay);
+			options.unityObject.sendMessage("XMLLoader","playFlag",options.isPlay);
 		}
 
 		/********************
