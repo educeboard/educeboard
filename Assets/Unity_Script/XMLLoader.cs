@@ -259,7 +259,7 @@ public class XMLLoader : MonoBehaviour {
 	}
 
 	void playFlag(int flag){
-		if (flag == 1) {
+		if (flag == 1 && step == STEP.READY) {
 			step = STEP.PLAY;
 //			GetComponent<GUIText>().text = "Now playing";
 			voiceLoader.GetComponent<AudioSource>().time = audioTime;

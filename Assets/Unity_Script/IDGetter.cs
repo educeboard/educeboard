@@ -34,8 +34,8 @@ public class IDGetter : MonoBehaviour {
 //			sid = "361897";
 //			sid = "361927";
 //			sid = "361930";
-			sid = "361958";
-			tid ="1";
+//			sid = "361958";
+//			tid ="1";
 //		}
 
 	}
