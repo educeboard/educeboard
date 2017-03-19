@@ -31,11 +31,13 @@ public class XMLLoader : MonoBehaviour {
 	#endregion
 
 	#region モデル関連
+	//モデルの参照
 	public GameObject male;
 	public GameObject female;
 	public GameObject teacher;
 	public GameObject desk;
 
+	//PrefabPath指定
 	const string PREFAB_MODEL_PATH = "Models/";
 	const string MODEL_MALE = "edBoy_fix";
 	const string MODEL_FEMALE = "edGirl_fix";
@@ -43,10 +45,16 @@ public class XMLLoader : MonoBehaviour {
 	const string MODEL_FEMALE_TEACHER = "teacher_female_fix";
 	const string MODEL_DESK = "desk";
 
+	//ノイズMIDを排除する値(この値以上カウントされるとデータとして適用する)
 	const int MID_CHECK_SKIP_COUNT = 10;
+
+	//閾値(この値以上になると更新される値)の設定
+	const float ROT_CHECK_SKIP_VALUE = 1f;	// Rotationの閾値
+	const float POS_CHECK_SKIP_VALUE = 0.1f;	// Positionの閾値
 	#endregion
 
 	#region 状態管理
+	/// <summary>遷移状態</summary>
 	public enum STEP
 	{
 		NONE 	= 0,
@@ -60,12 +68,8 @@ public class XMLLoader : MonoBehaviour {
 	float audioTime =0;
 
 	VoiceLoader voiceLoader;
-
 	STEP step = STEP.NONE;
 
-//	[SerializeField] int isStart = 0;
-//	[SerializeField] int isPlay = 0;
-//	[SerializeField] bool readiness = false;
 	#endregion
 
 	void Start () {
@@ -121,7 +125,7 @@ public class XMLLoader : MonoBehaviour {
             float ts   = Convert.ToSingle(person["TS"]);
             float posx = Convert.ToSingle(person["x"])*(float)0.10;
             float posy = 8-Convert.ToSingle(person["y"])*(float)0.10;
-            float dirx = Convert.ToSingle(person["d1"]);
+            float roty = Convert.ToSingle(person["d1"]);
             int   col  = Convert.ToInt32(person["status"]);
 			if (!midDic.ContainsKey ("mid" + mid)) {
 				midDic.Add ("mid" + mid, 1);
@@ -134,25 +138,17 @@ public class XMLLoader : MonoBehaviour {
 					DataList.Add (new List<LocationData> ());
 				} else {
 //					Debug.Log ("datalistの長さ" + DataList.Count);
-					DataList [mid - 1001].Add (new LocationData (mid, ts, posx, posy, col, dirx));
+					DataList [mid - 1001].Add (new LocationData (mid, ts, posx, posy, col, roty));
 				}
 			} else {
 				if (mid >= DataList.Count) {
 					DataList.Add (new List<LocationData> ());
 				} else {
-					DataList [mid].Add (new LocationData (mid, ts, posx, posy, col, dirx));
+					DataList [mid].Add (new LocationData (mid, ts, posx, posy, col, roty));
 				}
 			}
         }
-		/*各アクターの位置情報のデバック用出力。あまりおおきいデータだとこのデバック出力のせいでUnityがフリーズします。
-		foreach (List<LocationData> List in DataList) {
-			Debug.Log(List.Count);
-			foreach (LocationData Data in List){
-				if(1 <= List.Count){
-					Debug.Log("mid："+Data.mid+"、ts："+Data.ts+"、posx："+Data.posx+"、posy："+Data.posy);
-				}
-			}
-		}*/
+
 		Debug.Log("<color=blue>Parse Complete</color>");
 		#endregion
 
@@ -161,12 +157,11 @@ public class XMLLoader : MonoBehaviour {
 		Debug.Log("<color=blue>Create 3d Objects</color>");
         /*3Dオブジェクトの作成*/
 		foreach (List<LocationData> List in DataList) {
-//			Debug.Log (List.Count);
 			GameObject actor;
 			if(1 <= List.Count){
-				Vector3 pos    = new Vector3(List[0].posx,(float)0.3,List[0].posy);
-				Quaternion dir = Quaternion.Euler(0,List[0].dirx,0);
-				Vector3 tpos = new Vector3(List[0].posx,(float)1,List[0].posy);
+				Vector3 pos    = new Vector3(List[0].posX,(float)0.3,List[0].posZ);
+				Quaternion dir = Quaternion.Euler(0,List[0].angleY,0);
+				Vector3 tpos = new Vector3(List[0].posX,(float)1,List[0].posZ);
 //				Debug.LogWarning("mid"+List[0].mid+" is "+Who(List[0].mid));
 				if (midDic ["mid" + List [0].mid] > MID_CHECK_SKIP_COUNT) {
 					switch (Who (List [0].mid)) {
@@ -213,7 +208,7 @@ public class XMLLoader : MonoBehaviour {
 
 
 	void Update () {
-		
+		// Application.ExternalCall はJS側の関数を呼んでいます。
 
 		switch(step)
 		{
@@ -264,10 +259,8 @@ public class XMLLoader : MonoBehaviour {
 	}
 
 	void playFlag(int flag){
-//		isStart = flag;
 		if (flag == 1) {
 			step = STEP.PLAY;
-//			isPlay = 1;
 //			GetComponent<GUIText>().text = "Now playing";
 			voiceLoader.GetComponent<AudioSource>().time = audioTime;
 			voiceLoader.GetComponent<AudioSource>().Play ();
@@ -304,62 +297,31 @@ public class XMLLoader : MonoBehaviour {
 	private IEnumerator Relocate(float time)
 	{
 		while(true){
-		/*改善ポイント*/
-//		Debug.Log(audioTime);
-
 		foreach (List<LocationData> List in DataList) {
 			
 			LocationData Data = getActorLocation(List);
 			//二重foreachの見た目を避け可読性をあげると以下の条件分岐が入ってしまうので、関数を使わないほうがいいかも
 			if(1 <= List.Count&&Data!=null){
-				GameObject actor = GameObject.Find("mid"+Data.mid.ToString());
-				Vector3 tmppos = actor.transform.position;
-				Vector3 tmpdir = new Vector3 (actor.transform.rotation.x, actor.transform.rotation.y, actor.transform.rotation.z);
-							
-				
+					GameObject actor = GameObject.Find("mid"+Data.mid.ToString());
+					Vector3 tmpPos = actor.transform.position;
+					Vector3 tmpAngle = new Vector3 (actor.transform.eulerAngles.x, actor.transform.eulerAngles.y, actor.transform.eulerAngles.z);
 
-				/*if(Data.mid>=1 && 8>=Data.mid){
-//					switch(Data.col){
-//					case 0:
-//						actor.transform.FindChild("eye1").gameObject.SetActive(true);
-//						actor.transform.FindChild("eye2").gameObject.SetActive(false);
-//						actor.transform.FindChild("eye3").gameObject.SetActive(false);
-//						actor.transform.FindChild("note").gameObject.SetActive(false);
-//					break;
-//					case 1:
-//						actor.transform.FindChild("eye1").gameObject.SetActive(false);
-//						actor.transform.FindChild("eye2").gameObject.SetActive(false);
-//						actor.transform.FindChild("eye3").gameObject.SetActive(true);
-//						actor.transform.FindChild("note").gameObject.SetActive(false);
-//					break;
-//					case 2:
-//						actor.transform.FindChild("eye1").gameObject.SetActive(false);
-//						actor.transform.FindChild("eye2").gameObject.SetActive(true);
-//						actor.transform.FindChild("eye3").gameObject.SetActive(false);
-//						actor.transform.FindChild("note").gameObject.SetActive(true);
-//					break;
-//					default:break;
-//					}
-				}*/
-
-//				float movex = Data.posx - actor.transform.position.x;
-//				float movez = Data.posy - actor.transform.position.z;
-//				float diry = Data.dirx - actor.transform.rotation.y;
-//				actor.transform.Translate(movex,0,movez,Space.World);
-					var finpos = new Vector3 (Data.posx, actor.transform.position.y, Data.posy);
-//				actor.transform.position = Vector3.Lerp (actor.transform.position, finpos,Time.deltaTime);
-
-//						actor.transform.eulerAngles = new Vector3(0f,Mathf.LerpAngle(actor.transform.eulerAngles.y,diry,1f),0f);
+					Vector3 dataPos = new Vector3 (Data.posX, actor.transform.position.y, Data.posZ);
+					bool isMoveX = Mathf.Abs(tmpPos.x - dataPos.x) > POS_CHECK_SKIP_VALUE;
+					bool isMoveZ = Mathf.Abs(tmpPos.z - dataPos.z) > POS_CHECK_SKIP_VALUE;
+					Vector3 updatePos = isMoveX || isMoveZ ? dataPos : tmpPos;
 
 
 
-					actor.transform.position = Vector3.Lerp (actor.transform.position, finpos,0.7f);
-//					var rot = Quaternion.Euler(0,Data.dirx , 0);
-				tmpdir.y = Data.dirx;
-//					actor.transform.rotation = Quaternion.Slerp (actor.transform.rotation, rot, 0.5f);
-						actor.transform.eulerAngles = tmpdir;
-//Debug.Log("mid"+Data.mid.ToString() + "movex = "+movex+", movey = 0 , movez = "+ movez +", diry = " + diry);
+					//マイナスをプラスにする (ex. -80 => 280
+					Data.angleY =  Data.angleY < 0 ? 360f +Data.angleY : Data.angleY;
+					bool isChangeRot = Mathf.Abs(tmpAngle.y - Data.angleY) > ROT_CHECK_SKIP_VALUE;
+					if(isChangeRot)
+						tmpAngle.y = actor.transform.eulerAngles.y;
 
+					//positionとrotation更新
+					actor.transform.position = Vector3.Lerp (actor.transform.position, updatePos,0.7f);
+					actor.transform.eulerAngles = Vector3.Lerp(actor.transform.eulerAngles,tmpAngle,0.5f);
 			}
 		}
 			yield return new WaitForSeconds(time);
@@ -415,20 +377,19 @@ public class XMLLoader : MonoBehaviour {
 
 //位置情報のクラス
 public class LocationData{
-	public int mid;
-	public float ts;
-	public float posx;
-	public float posy;
-	public float dirx;
+	public int mid;		//	オブジェクトの識別id
+	public float ts;	//タイムスタンプ
+	public float posX;	//x座標
+	public float posZ;	//z座標
+	public float angleY;	//yのRotation
 	public int col;
 
-	public LocationData(int getMid,float getTs,float getposX,float getposY,int getColor,float getdirX){
+	public LocationData(int getMid,float getTs,float getposX,float getposZ,int getColor,float getrotY){
 		mid = getMid;
 		ts = getTs;
-		posx = getposX;
-		posy = getposY;
+		posX = getposX;
+		posZ = getposZ;
 		col = getColor;
-		dirx = getdirX;
-
+		angleY = getrotY;
 	}
 }
