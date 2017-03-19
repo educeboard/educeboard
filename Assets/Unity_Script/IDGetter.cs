@@ -23,7 +23,7 @@ public class IDGetter : MonoBehaviour {
 		}
 
 		//デバッグ用,Aキーを押したらsid300,tid1を入れる
-		if (Input.GetKeyDown(KeyCode.A)) {
+//		if (Input.GetKeyDown(KeyCode.A)) {
 //			sid = "361782";
 //			sid = "361764";
 //			sid = "361745";
@@ -36,7 +36,7 @@ public class IDGetter : MonoBehaviour {
 //			sid = "361930";
 			sid = "361958";
 			tid ="1";
-		}
+//		}
 
 	}
 
