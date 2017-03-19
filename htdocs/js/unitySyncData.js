@@ -22,7 +22,7 @@ unitySendData
 
 				// オプションをセット
 				$(this).data(namespace, $.extend(true, {
-					unityObject:UnityLoader.instantiate("unityPlayer", "./unity/Build/educetest.json", {onProgress: UnityProgress})
+					unityObject:UnityLoader.instantiate("unityPlayer", "./unity/Build/educeboard.json", {onProgress: UnityProgress})
 					,$IDDOM:$(this).find('[data-' + namespace + '-parts="sendID"]')
 					,$seekbar:$(this).find('[data-' + namespace + '-parts="seekbar"]')
 					,$timeLength:$(this).find('[data-' + namespace + '-parts="timeLength"]')
