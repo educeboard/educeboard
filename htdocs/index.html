@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="./css/reset.css">
+	<link rel="stylesheet" href="./css/educeboard_body.css">
+</head>
+<body>
+	<div id="wrapper" data-educeboardDataLoad data-unitySyncData>
+		<header id="header">
+			<h1>
+				<a href="#">えでゅーすぼーど</a>
+			</h1>
+			<nav>
+				<ul>
+					<li><a href="#"><span>TOP</span></a></li>
+					<li><a href="#"><span>セッション選択</span></a></li>
+					<li><a href="#"><span>ログアウト</span></a></li>
+				</ul>
+			</nav>
+			<p class="elWelcome" aria-hidden="true" data-educeboardDataLoad-parts="loginInfo"><span>ようこそ</span><span class="elUserName" data-educeboardDataLoad-parts="username"></span><span>さん</span></p>
+		</header>
+		<div id="login" aria-hidden="false">
+			<div class="mdLoginForm">
+				<dl class="elIdSelect">
+					<dt class="elTitle">コース</dt>
+					<dd class="elItem">
+						<div class="elSelectButton" aria-activedescendant="">
+							<a href="#" id="coursePulldownButton" data-pullDown aria-controles="courcePulldown" role="button">コースを選択</a>
+						</div>
+						<ul id="courcePulldown" aria-expanded="false">
+
+						</ul>
+					</dd>
+					<dt class="elTitle">名前</dt>
+					<dd class="elItem">
+						<div class="elSelectButton" aria-activedescendant="">
+							<a href="#" id="namePulldownButton" data-pullDown aria-controles="namePulldown" role="button">名前を選択</a>
+						</div>
+						<ul id="namePulldown" aria-expanded="false">
+
+						</ul>
+					</dd>
+					<dt class="elTitle">パスワード</dt>
+					<dd class="elItem">
+						<div class="elPassword">
+							<span><input type="password" disabled></span>
+						</div>
+					</dd>
+				</dl>
+				<div class="elLoginButton" aria-activedescendant="">
+					<a href="#" id="loginButton" data-libDialog-parts="show" aria-controles="movieSelect">ログイン</a>
+				</div>
+			</div>
+		</div>
+		<div id="movieSelect" aria-hidden="true" data-libDialog role="dialog">
+			<section class="mdMovieSelect">
+				<header class="elHeader">
+					<h1>シミュレーション一覧</h1>
+					<p class="elClose"><a href="#" data-libDialog-parts="close" data-educeboardDataLoad-parts="logout" aria-controles="movieSelect"><span>閉じる</span></a></p>
+				</header>
+				<div class="elItem">
+					<ul class="elSimulationList" data-listExpand data-educeboardDataLoad-parts="simulationList">
+
+					</ul>
+				</div>
+			</section>
+		</div>
+		<div id="educeboard" aria-hidden="true">
+			<div id="educeboardMovie">
+				<div id="unityPlayer"></div>
+				<div id="Player">
+					<div class="mdSeekbar" data-unitySyncData-parts="seekbar" data-libDragAndDrop>
+						<div class="elTimeLength" data-unitySyncData-parts="timeLength"></div>
+						<div class="elTimePosition" data-unitySyncData-parts="timePosition" data-libDragAndDrop-parts="dragObject"></div>
+					</div>
+					<div class="mdController">
+						<ul>
+							<li class="elPlayButton">
+								<ul data-playStatus="true" data-unitySyncData-parts="playButton">
+									<li class="elPlay" aria-hidden="false" data-unitySyncData-parts="play"><a href="#">play</a></li>
+									<li class="elStop" aria-hidden="true" data-unitySyncData-parts="pause"><a href="#">Stop</a></li>
+								</ul>
+							</li>
+							<li class="elVolumeTrigger">
+								<a href="#">
+									<span></span>
+								</a>
+								<div class="elVolume">
+									<div class="elVolumeBar" data-unitySyncData-parts="volumeBar" data-libDragAndDrop>
+										<div class="elVolumeLevel" data-unitySyncData-parts="volumeLength"></div>
+										<div class="elVolumePosition" data-unitySyncData-parts="volumePosition" data-libDragAndDrop-parts="dragObject"></div>
+									</div>
+								</div>
+							</li>
+							<li class="elTimeView">
+								<span data-unitySyncData-parts="timeView" data-unitySyncData-time="0">88:88:88</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div id="commentArea" data-commentSyncScroll>
+				<div class="elInputComment" data-commentSyncScroll-parts="sendArea">
+					<div class="elTextArea">
+						<textarea placeholder="コメントを入力" data-commentSyncScroll-parts="textbox"></textarea>
+					</div>
+					<ul class="elButton">
+						<li class="elSubmit"><a href="#" data-commentSyncScroll-parts="submit">投稿</a></li>
+						<li class="elMovieControl"><a href="#">再生</a></li>
+					</ul>
+					<div class="elIsSyncScroll">
+							<label>
+								<input type="checkbox" data-commentSyncScroll-parts="isSyncScroll" checked>
+								<span>コメントを自動スクロールさせる</span>
+							</label>
+					</div>
+				</div>
+				<div class="elCommentList" data-commentSyncScroll-parts="viewArea">
+					<ul data-educeboardDataLoad-parts="commentArea">
+
+					</ul>
+				</div>
+			</div>
+			<div class="mdLoadOverlay" aria-hidden="true" data-unitySyncData-parts="loadOverlay">
+				<div class="elLoadingState" aria-hidden="false" data-unitySiyncData-parts="loadingState">
+					<p class="elProgressState">NowLoading...</p>
+					<div class="elProgressPercent"><span data-unitySyncData-parts="progress">0%</span></div>
+				</div>
+				<div class="elErrorAvoidance" aria-hidden="true" data-unitySiyncData-parts="errorMessage">
+					<h2><span>読み込みエラー</span></h2>
+					<p class="elErrorMessage">シミュレーションを選び直すか、IDを入力してください。</p>
+					<div class="elRetryButton">
+						<p>
+							<button><span>シミュレーションを選びなおす</span></button>
+						</p>
+					</div>
+					<ul class="elIDInput">
+						<li>
+							<dl>
+								<dt>SessionID</dt>
+								<dd><span><input type="text"></span></dd>
+							</dl>
+						</li>
+						<li>
+							<dl>
+								<dt>TrialID</dt>
+								<dd><span><input type="text"></span></dd>
+							</dl>
+						</li>
+					</ul>
+					<div class="elRetryButton">
+						<p>
+							<button><span>送信</span></button>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<footer>
+			<p>
+				<small>Copyright (C) 2012-2015 mochi-lab. All rights reserved.</small>
+			</p>
+		</footer>
+	</div>
+	<!-- <script src="http://webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/UnityObject.js"></script> -->
+	<!-- <script src="./js/UnityObject2.js"></script> -->
+	<script src="./unity/TemplateData/UnityProgress.js"></script>
+	<script src="./unity/Build/UnityLoader.js"></script>
+	<script src="./js/jquery-1.11.1.min.js"></script>
+	<script src="./js/pullDown.js"></script>
+	<script src="./js/libDialog.js"></script>
+	<script src="./js/listExpand.js"></script>
+	<script src="./js/educeboardDataLoad.js"></script>
+	<script src="./js/libDragAndDrop1.0.js"></script>
+	<script src="./js/unitySyncData.js"></script>
+	<script src="./js/commentSyncScroll.js"></script>
+	<script>
+
+		// var config = {
+		// 	width: 540,
+		// 	height: 405,
+		// 	enableUnityAnalytics: false,
+		// 	enableGoogleAnalytics: false,
+		// 	params: { enableDebugging:"0" }
+		// }
+
+		// unityObject = new UnityObject2(config);
+
+		$('[data-libDragAndDrop].mdSeekbar').libDragAndDrop({
+			Xmode:true
+			,$target:$('#educeboardMovie')
+			,dragging:function(){
+				$('[data-unitySyncData]').unitySyncData('timeLengthUpdate');
+			}
+			,dragEndAfter:function(){
+				$('[data-unitySyncData]').unitySyncData('resultTimePosition');
+			}
+		});
+		$('[data-libDragAndDrop].elVolumeBar').libDragAndDrop({
+			Xmode:true
+			,$target:$('#Player .elVolume')
+			,dragStartBefore:function(){
+				$('[data-unitySyncData]').unitySyncData('volumeLengthUpdate');
+			}
+			,dragging:function(){
+				$('[data-unitySyncData]').unitySyncData('volumeLengthUpdate');
+			}
+		});
+
+		$('[data-libDialog]').libDialog({
+			setEvent:false
+			,overlayAnotherAttr : 'data-educeboardDataLoad-parts="logout"'
+		});
+
+		$('[data-educeboardDataLoad]').educeboardDataLoad({
+			// ,courseURL:
+			courseLoaded:function(){
+				$('#coursePulldownButton[data-pullDown]').pullDown();
+			}
+			,userLoaded:function(){
+				$('#namePulldownButton[data-pullDown]').pullDown();
+			}
+			,beforeAuth:function(){
+				$('[data-educeboardDataLoad]').educeboardDataLoad('simulationRemove');
+			}
+			,authSuccess:function(){
+
+				$('[data-unitySyncData]').unitySyncData({
+					// unityObject:unityObject
+					afterTimeAppend:function(){
+						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+					}
+					,afterRecieveXMLLoadedFlag:function(){
+						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+					}
+					,resultTimePosition:function(){
+						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+					}
+				});
+
+			}
+			,authFail:function(){
+				$('[data-libDialog]').libDialog('destroy');
+				$('[data-libDialog]').libDialog({
+					setEvent:false
+					,overlayAnotherAttr : 'data-educeboardDataLoad-parts="logout"'
+				});
+			}
+			,userLogout:function(){
+				$('[data-libDialog]').libDialog('destroy');
+				$('[data-libDialog]').libDialog({
+					setEvent:false
+					,overlayAnotherAttr : 'data-educeboardDataLoad-parts="logout"'
+				});
+			}
+			,simulationLoaded:function(){
+				$('[data-libDialog]').libDialog('showDialog');
+				$('[data-listExpand]').listExpand();
+			}
+			,commentLoaded:function(){
+				// console.log('beforesync');
+				$('[data-commentSyncScroll]').commentSyncScroll();
+			}
+			,idResult:function(){
+				$('[data-libDialog]').libDialog('closeDialog');
+			}
+		});
+
+
+		// $('#login').educeboardDataLoad({
+		// 	basicInfoObj:{sid:289,tid:1}
+		// 	,commentLoaded:function(){
+		// 		$('[data-commentSyncScroll]').commentSyncScroll({userInfo:{uid:1,uname:'望月俊男'}});
+		// 	}
+		// });
+
+		// $('#login').educeboardDataLoad('commentLoader');
+
+
+
+
+		// var timer
+		// ,nowTime = 35
+		// ,isTimer = false
+		// ,$_timeView = $('[data-unitySyncData-time]')
+		// ,timeObject = {};
+
+		// function timeCount(){
+		// 	nowTime += 1;
+
+		// 	// console.log(nowTime);
+
+		// 	timeObject.second = nowTime;
+		// 	timeObject.minute = parseInt(timeObject.second / 60);
+		// 	timeObject.hour = parseInt(timeObject.minute / 60);
+
+		// 	timeObject.minute = timeObject.minute - 60 * timeObject.hour;
+		// 	timeObject.second = timeObject.second - 60 * timeObject.minute;
+
+		// 	var str = '';
+		// 	for(var i in timeObject){
+		// 		if(timeObject[i] < 10){
+		// 			timeObject[i] = '0' + timeObject[i];
+		// 		}
+
+		// 		str += timeObject[i];
+
+		// 		if(i != 'second'){
+		// 			str += ':';
+		// 		}
+		// 	}
+
+		// 	$_timeView.text(str).attr('data-unitySyncData-time',nowTime);
+
+		// 	$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+		// }
+		// $('[data-unitySyncData-parts="playButton"]').on('click','a',function(e){
+		// 	// console.log(isTimer);
+		// 	e.preventDefault();
+		// 	if(isTimer){
+		// 		clearInterval(timer);
+		// 		isTimer = false;
+		// 	}
+		// 	else{
+		// 		timer = setInterval(timeCount,1000);
+		// 		isTimer = true;
+		// 	}
+		// });
+	</script>
+</body>
+</html>

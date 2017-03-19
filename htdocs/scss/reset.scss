@@ -1,0 +1,23 @@
+@charset "utf-8";
+@import "compass";
+
+html,body,section,article,figure,figcaption,header,footer,aside,div,ul,ol,li,dl,dt,dd,p,img,input,textarea,#{headings()}{
+	margin:0;
+	padding:0;
+	box-sizing:border-box;
+}
+
+input[type="text"],textarea{
+-webkit-appearance:none;
+appearance:none;
+border:none;
+border-radius:0;
+}
+
+:root{
+	font:normal 13px/1.7 "Hiragino Kaku Gothic ProN", Meiryo, "MS PGothic", sans-serif;
+}
+
+ul,ol,li{
+	list-style: none;
+}
