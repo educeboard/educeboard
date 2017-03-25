@@ -73,7 +73,9 @@ public class XMLLoader : MonoBehaviour {
 	#endregion
 
 	void Start () {
-
+		#if !UNITY_EDITOR && UNITY_WEBGL
+		WebGLInput.captureAllKeyboardInput = false;
+		#endif
 		if (string.IsNullOrEmpty (IDGetter.sid) || string.IsNullOrEmpty (IDGetter.tid)) {
 			Debug.Log ("<color=red>[ID Error]:sid or tid is null. move to LoadScene</color>");
 			SceneManager.LoadScene("LoadScene");
