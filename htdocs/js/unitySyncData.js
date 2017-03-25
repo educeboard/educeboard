@@ -99,7 +99,7 @@ unitySendData
 			,options = $this.data(namespace)
 			,unityObject = options.unityObject;
 
-			console.log(options);
+			console.log(options.unityObject);
 
 			// unityObject.initPlugin($('#unityPlayer')[0],options.unityPath);
 
@@ -114,8 +114,6 @@ unitySendData
 					//unityが読み込まれていて、かつ、すでにIDが決まっていた時は、この関数がIDを送信する
 					options.unityObject.sendMessage("Loader", "GetSID", options.id.sessionId);
 					options.unityObject.sendMessage("Loader", "GetTID", options.id.trialId);
-					//音も送る（この場所じゃないほうがいい）
-					options.unityObject.sendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
 				}
 			}
 
@@ -150,10 +148,9 @@ unitySendData
 
 				//sendFlagがtrueになっていなかったら、まだunityが読み込まれていないためIDは送信しない
 				if(options.sendFlag){
+					console.log('sendMessage!!');
 					options.unityObject.sendMessage("Loader", "GetSID", options.id.sessionId);
 					options.unityObject.sendMessage("Loader", "GetTID", options.id.trialId);
-					//音も送る（この場所じゃないほうがいい）
-					options.unityObject.sendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
 				}
 
 
@@ -468,6 +465,7 @@ unitySendData
 					methods.setEvent.apply($this);
 					methods.playToggle.apply($this);
 					options.$loadOverlay.attr('aria-hidden',true);
+					options.unityObject.sendMessage("XMLLoader", "SetSoundValue", options.volumeValue);
 					methods.applyCallback.apply([$this,'afterRecieveXMLLoadedFlag']);
 				}
 				else if(flag == -1){
