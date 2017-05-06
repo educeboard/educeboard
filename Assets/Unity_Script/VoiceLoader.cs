@@ -34,7 +34,7 @@ public class VoiceLoader : MonoBehaviour {
 
 
 		yield return www;
-		Debug.Log (www.progress);
+//		Debug.Log (www.progress);
 		if (!string.IsNullOrEmpty (www.error)) {
 			Debug.LogWarning (www.error.ToString());
 			Debug.Log("voice error");

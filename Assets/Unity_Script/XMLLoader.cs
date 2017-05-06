@@ -8,7 +8,7 @@ using MiniJSON;
 using UnityEngine.UI;
 using System;
 using System.Runtime.Serialization;
-using UnityEngine.SceneManagement; 
+using UnityEngine.SceneManagement;
 
 public class XMLLoader : MonoBehaviour {
 	#region 読み込み関連
@@ -24,7 +24,7 @@ public class XMLLoader : MonoBehaviour {
 	///<summary>全アクターの位置情報のリストを保持する二重リスト</summary>
 	List<List<LocationData>> DataList = new List<List<LocationData>>();
 	///<summary>各アクターの時間毎の座標・方向情報を保持するリスト</summary>
-	List<GameObject> actorList = new List<GameObject>();
+//	List<GameObject> actorList = new List<GameObject>();
 
 	Dictionary <string, int> midDic = new Dictionary<string, int> ();
 //	Dictionary <GameObject,Vector3> posDic = new Dictionary<GameObject, Vector3> ();
@@ -73,6 +73,8 @@ public class XMLLoader : MonoBehaviour {
 	#endregion
 
 	void Start () {
+
+
 		#if !UNITY_EDITOR && UNITY_WEBGL
 		WebGLInput.captureAllKeyboardInput = false;
 		#endif
@@ -90,13 +92,45 @@ public class XMLLoader : MonoBehaviour {
 		voiceLoader = GetComponent<VoiceLoader> ();
 
 		//ダウンロード先のJSONのパス
-		XMLFilePath = "http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/readMarkersLocator2.php?session_id="+sid+"&tid="+tid+"&xml="+xmlid;
+//		XMLFilePath = "http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/readMarkersLocator2.php?session_id="+sid+"&tid="+tid+"&xml="+xmlid;
+		XMLFilePath = "http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/readMarkersLocator4.php?session_id="+sid+"&tid="+tid+"&xml="+xmlid+"&json=1";
 		//XMLFilePath = Application.dataPath + "/XML"+"/readMarkersLocator.php.xml"; //local
 		//Debug.Log("XMLFilePath is :" + XMLFilePath);
 
 		StartCoroutine("Load");
 		StartCoroutine("Relocate",0.1f);
 
+	}
+
+
+	[Serializable]
+	public class data
+	{
+		public List<table> Items;
+	}
+		
+	[Serializable]
+	public class Serialization<T>
+	{
+		[SerializeField]
+		List<T> target;
+		public List<T> ToList() { return target; }
+
+		public Serialization(List<T> target)
+		{
+			this.target = target;
+		}
+	}
+
+	[Serializable]
+	public class table
+	{
+		public int mid;		//	オブジェクトの識別id
+		public float TS;	//タイムスタンプ
+		public float x;	//x座標
+		public float y;	//z座標
+		public float d1;	//yのRotation
+		public int status;
 	}
 
 	//位置情報をロードする関数
@@ -118,17 +152,35 @@ public class XMLLoader : MonoBehaviour {
 
 
 		#region parse data
+
 		//データをパースする
 		Debug.Log("<color=blue>Parse Start</color>");
 		string json = getXML.text;
-        IList familyList = (IList)Json.Deserialize(json);
-        foreach(IDictionary person in familyList){
-            int   mid  = Convert.ToInt32(person["mid"]);
-            float ts   = Convert.ToSingle(person["TS"]);
-            float posx = Convert.ToSingle(person["x"])*(float)0.10;
-            float posy = 8-Convert.ToSingle(person["y"])*(float)0.10;
-            float roty = Convert.ToSingle(person["d1"]);
-            int   col  = Convert.ToInt32(person["status"]);
+//        IList familyList = (IList)Json.Deserialize(json);
+//		var dataList = JsonUtility.FromJson<data>(json);
+//		Debug.Log("<color=green>"+json+"</color>");
+		var jsonData = JsonUtility.FromJson<data> (json);
+
+//		foreach(IDictionary person in familyList){
+		foreach (var person in jsonData.Items) {
+			
+//			int   mid  = Convert.ToInt32(person["mid"]);
+//			float ts   = Convert.ToSingle(person["TS"]);
+//			float posx = Convert.ToSingle(person["x"])*(float)0.10;
+//			float posy = 8-Convert.ToSingle(person["y"])*(float)0.10;
+//			float roty = Convert.ToSingle(person["d1"]);
+//			int   col  = Convert.ToInt32(person["status"]);
+
+			int   mid  = person.mid;
+			float ts   = person.TS;
+			float posx = person.x*(float)0.10;
+			float posy = person.y*(float)0.10;
+			float roty = person.d1;
+			int   col  = person.status;
+
+//			Debug.Log("<color=green>"+mid+","+ts+","+posx+","+posy+","+roty+","+col+"</color>");
+
+
 			if (!midDic.ContainsKey ("mid" + mid)) {
 				midDic.Add ("mid" + mid, 1);
 			} else {
@@ -170,27 +222,27 @@ public class XMLLoader : MonoBehaviour {
 					case "male":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_MALE), pos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						actorList.Add (actor);
+//						actorList.Add (actor);
 						break;
 					case "female":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_FEMALE), pos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						actorList.Add (actor);
+//						actorList.Add (actor);
 						break;
 					case "teacher":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_MALE_TEACHER), tpos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						actorList.Add (actor);;
+//						actorList.Add (actor);
 						break;
 					case "teacher_woman":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_FEMALE_TEACHER), tpos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						actorList.Add (actor);
+//						actorList.Add (actor);
 						break;
 					case "desk":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_DESK), pos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						actorList.Add (actor);
+//						actorList.Add (actor);
 						break;
 					default:
 						break;
@@ -201,9 +253,7 @@ public class XMLLoader : MonoBehaviour {
 		}
 		Debug.Log("<color=blue>Copmlete Create 3d Objects</color>");
 		#endregion
-
 		XMLHasLoad = true;
-		Application.ExternalCall("xmlLoadFlag",1);
 		time = 0;
 	}
 
@@ -218,14 +268,15 @@ public class XMLLoader : MonoBehaviour {
 			return;
 		case STEP.LOAD:
 			if (XMLHasLoad == false) {
-				Application.ExternalCall ("xmlProgress", getXML.progress);
+//				Application.ExternalCall ("xmlProgress", getXML.progress);
 			}
 			if (voiceLoader.hasLoad == false) {
-				Application.ExternalCall ("voiceProgress", voiceLoader.www.progress);
+//				Application.ExternalCall ("voiceProgress", voiceLoader.www.progress);
 			}
 			
 			if (voiceLoader.hasLoad && XMLHasLoad) {
 				step = STEP.READY;
+				Application.ExternalCall("xmlLoadFlag",1);
 			}
 			break;
 		case STEP.READY:
@@ -256,11 +307,12 @@ public class XMLLoader : MonoBehaviour {
 //				//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
 //			}
 		}
-		Debug.Log (step);
+//		Debug.Log (step);
 		//Debug.Log("音声ロード進捗 = "+voiceLoader.www.progress+", XMLロード進捗 = "+getXML.progress+", 再生中か = "+(isStart==0)+"データリストの長さ："+DataList.Count);
 	}
 
 	void playFlag(int flag){
+		Debug.Log ("playFlag:"+flag+",step:"+step);
 		if (flag == 1 && step == STEP.READY) {
 			step = STEP.PLAY;
 //			GetComponent<GUIText>().text = "Now playing";
