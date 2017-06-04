@@ -10,7 +10,7 @@ public class IDGetter : MonoBehaviour {
 
 	void Start () {
 		#if !UNITY_EDITOR && UNITY_WEBGL
-//		WebGLInput.captureAllKeyboardInput = false;
+		WebGLInput.captureAllKeyboardInput = false;
 		#endif
 		sid = null;
 		tid = null;
