@@ -326,7 +326,7 @@ public class XMLLoader : MonoBehaviour {
 //			jsonData = dic["Items"] as List<table>;
 //		}
 
-		var cnt = 0;
+//		var cnt = 0;
 
 //		while (jsonData.Items.Count > 0)
 //		{
@@ -451,15 +451,19 @@ public class XMLLoader : MonoBehaviour {
 			return;
 		case STEP.LOAD:
 			if (XMLHasLoad == false) {
-//				Application.ExternalCall ("xmlProgress", getXML.progress);
+				Application.ExternalCall ("xmlProgress", getXML.progress);
 			}
 			if (voiceLoader.hasLoad == false) {
-//				Application.ExternalCall ("voiceProgress", voiceLoader.www.progress);
+				Application.ExternalCall ("voiceProgress", voiceLoader.www.progress);
+//				if (voiceLoader.www.progress == 1f) {
+//					StartCoroutine(voiceLoader.CallSoundLength());
+//				}
 			}
 			
 			if (voiceLoader.hasLoad && XMLHasLoad) {
 				step = STEP.READY;
 				Application.ExternalCall("xmlLoadFlag",1);
+
 			}
 			break;
 		case STEP.READY:
@@ -496,7 +500,7 @@ public class XMLLoader : MonoBehaviour {
 
 	void playFlag(int flag){
 		Debug.Log ("playFlag:"+flag+",step:"+step);
-		if (flag == 1 && step == STEP.READY) {
+		if (flag == 1 && step == STEP.READY ||flag == 1 && step == STEP.PAUSE) {
 			step = STEP.PLAY;
 //			GetComponent<GUIText>().text = "Now playing";
 			voiceLoader.GetComponent<AudioSource>().time = audioTime;
@@ -569,7 +573,7 @@ public class XMLLoader : MonoBehaviour {
 					//positionとrotation更新
 					actor.transform.position = Vector3.Lerp (actor.transform.position, updatePos,0.7f);
 					actor.transform.eulerAngles = Vector3.Lerp(actor.transform.eulerAngles,tmpAngle,0.5f);
-					Debug.Log ("<color=red>"+actor.transform.position+"</color>");
+//					Debug.Log ("<color=red>"+actor.transform.position+"</color>");
 			}
 		}
 			yield return new WaitForSeconds(time);
