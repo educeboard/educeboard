@@ -188,6 +188,19 @@
 
 		// unityObject = new UnityObject2(config);
 
+		$('[data-unitySyncData]').unitySyncData({
+			// unityObject:unityObject
+			afterTimeAppend:function(){
+				$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+			}
+			,afterRecieveXMLLoadedFlag:function(){
+				$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+			}
+			,resultTimePosition:function(){
+				$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
+			}
+		});
+
 		$('[data-libDragAndDrop].mdSeekbar').libDragAndDrop({
 			Xmode:true
 			,$target:$('#educeboardMovie')
@@ -226,19 +239,6 @@
 				$('[data-educeboardDataLoad]').educeboardDataLoad('simulationRemove');
 			}
 			,authSuccess:function(){
-
-				$('[data-unitySyncData]').unitySyncData({
-					// unityObject:unityObject
-					afterTimeAppend:function(){
-						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
-					}
-					,afterRecieveXMLLoadedFlag:function(){
-						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
-					}
-					,resultTimePosition:function(){
-						$('[data-commentSyncScroll]').commentSyncScroll('commentSync');
-					}
-				});
 
 			}
 			,authFail:function(){
