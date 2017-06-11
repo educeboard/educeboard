@@ -485,6 +485,9 @@ public class XMLLoader : MonoBehaviour {
 			}
 			break;
 		case STEP.PAUSE:
+			if (Input.GetKeyDown (KeyCode.Space)) {
+				playFlag (1);
+			}
 			break;
 
 //			if(isStart==0 && isPlay==1){
@@ -499,7 +502,6 @@ public class XMLLoader : MonoBehaviour {
 	}
 
 	void playFlag(int flag){
-		Debug.Log ("playFlag:"+flag+",step:"+step);
 		if (flag == 1 && step == STEP.READY ||flag == 1 && step == STEP.PAUSE) {
 			step = STEP.PLAY;
 //			GetComponent<GUIText>().text = "Now playing";
@@ -513,6 +515,7 @@ public class XMLLoader : MonoBehaviour {
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
 			
 		}
+		Debug.Log ("playFlag:"+flag+",step:"+step);
 	}
 	
 	void soundPosition(float pos){
