@@ -24,13 +24,13 @@ public class VoiceLoader : MonoBehaviour {
 //		if (sid == null || tid == null)
 //			yield return null;
 //		WWW www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/300_1.mp3");
-		#if !UNITY_EDITOR && UNITY_WEBGL
-		www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".mp3");
-		Debug.Log ("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".mp3");
-		#else
+//		#if !UNITY_EDITOR && UNITY_WEBGL
+//		www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".mp3");
+//		Debug.Log ("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".mp3");
+//		#else
 		www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".ogg");
 		Debug.Log ("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".ogg");
-		#endif
+//		#endif
 
 
 		yield return www;
@@ -41,11 +41,11 @@ public class VoiceLoader : MonoBehaviour {
 //			Application.ExternalCall("xmlLoadFlag",-1);
 //			SceneManager.LoadScene("LoadScene");
 		}
-		#if !UNITY_EDITOR && UNITY_WEBGL
-		source.clip = www.GetAudioClip(true,false,AudioType.MPEG);
-		#else
+//		#if !UNITY_EDITOR && UNITY_WEBGL
+//		source.clip = www.GetAudioClip(true,false,AudioType.MPEG);
+//		#else
 		source.clip = www.GetAudioClip(true,false,AudioType.OGGVORBIS);
-		#endif
+//		#endif
 		//Debug.Log("DownloadSize:"+www.size/1024/1024+"Mbyte");
 		while (true)
 		{
