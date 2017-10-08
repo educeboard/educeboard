@@ -484,6 +484,7 @@ public class XMLLoader : MonoBehaviour {
 			if (voiceLoader.hasLoad && XMLHasLoad) {
 				step = STEP.READY;
 				Application.ExternalCall("xmlLoadFlag",1);
+				Debug.Log ("Ready");
 
 			}
 			break;
@@ -606,11 +607,6 @@ public class XMLLoader : MonoBehaviour {
 					{
 						tmpAngle.y = Data.angleY;
 					}
-					else
-					{
-						Debug.LogError ("ROT_SKIP");
-					}
-					
 
 					//positionとrotation更新
 					iTween.MoveTo (actor, updatePos, MOVE_SPEED);
