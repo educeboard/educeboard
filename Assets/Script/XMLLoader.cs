@@ -31,7 +31,7 @@ public class XMLLoader : MonoBehaviour {
 
 //	List<Dictionary <string,string>> jsonData = new List<Dictionary<string, string>>();
 
-	Dictionary <string, int> midDic = new Dictionary<string, int> ();
+	Dictionary <string, ActorData> actorDict = new Dictionary<string, ActorData> ();
 //	Dictionary <GameObject,Vector3> posDic = new Dictionary<GameObject, Vector3> ();
 	#endregion
 
@@ -51,11 +51,14 @@ public class XMLLoader : MonoBehaviour {
 	const string MODEL_DESK = "desk";
 
 	//ノイズMIDを排除する値(この値以上カウントされるとデータとして適用する)
-	const int MID_CHECK_SKIP_COUNT = 10;
+	const int MID_CHECK_SKIP_COUNT = 0;
 
 	//閾値(この値以上になると更新される値)の設定
-	const float ROT_CHECK_SKIP_VALUE = 1f;	// Rotationの閾値
-	const float POS_CHECK_SKIP_VALUE = 0.1f;	// Positionの閾値
+	const float ROT_CHECK_SKIP_VALUE = 0f;	// Rotationの閾値
+	const float POS_CHECK_SKIP_VALUE = 0f;	// Positionの閾値
+
+	const float MOVE_SPEED = 5f;
+	const float ROTATION_SPEED = 5f;
 	#endregion
 
 	#region 状態管理
@@ -288,7 +291,7 @@ public class XMLLoader : MonoBehaviour {
 	void NextData()
 	{
 		Debug.LogWarning ("packId:"+packId+",PackNum:"+packNum);
-		if (packId <= packNum)
+		if (packId < packNum)
 		{
 			var url = string.Format ("{0}{1}", JsonFilePath, packId.ToString ());
 			StartCoroutine (JsonRequest (url));
@@ -347,7 +350,8 @@ public class XMLLoader : MonoBehaviour {
 	void transformData(List<table> list)
 	{
 		Debug.LogWarning (list.Count);
-		foreach (var person in list) {
+		foreach (var person in list)
+		{
 			int   mid  = person.mid;
 			float ts   = person.TS;
 			float posx = person.x*(float)0.10;
@@ -355,36 +359,48 @@ public class XMLLoader : MonoBehaviour {
 			float roty = person.d1;
 			int   col  = person.status;
 
-			if (!midDic.ContainsKey ("mid" + mid))
+			if (!actorDict.ContainsKey ("mid" + mid))
 			{
-				midDic.Add ("mid" + mid, 1);
-			} else {
-				midDic ["mid" + mid] += 1;
+				var actorData = new ActorData(1,null);
+				actorDict.Add ("mid" + mid,actorData);
+			}
+			else
+			{
+				actorDict ["mid" + mid].counter += 1;
 			}
 
-			if (mid >= 1000) {
-				if (mid - 1000 >= DataList.Count) {
+			if (mid >= 1000) 
+			{
+				if (mid - 1000 >= DataList.Count)
+				{
 					DataList.Add (new List<LocationData> ());
-				} else {
+				}
+				else
+				{
 					//					Debug.Log ("datalistの長さ" + DataList.Count);
 					DataList [mid - 1001].Add (new LocationData (mid, ts, posx, posy, col, roty));
 				}
-			} else {
-				if (mid >= DataList.Count) {
+			}
+			else
+			{
+				if (mid >= DataList.Count)
+				{
 					DataList.Add (new List<LocationData> ());
-				} else {
+				}
+				else
+				{
 					DataList [mid].Add (new LocationData (mid, ts, posx, posy, col, roty));
 				}
 			}
 //			Debug.Log ("<color=red>mid:"+person.mid+",ts:"+person.TS+",PosX:"+person.x+"</color>");
 		}
 		Debug.LogError (DataList.Count);
-		if (!XMLHasLoad)
+		if (!XMLHasLoad && packId == packNum)
 		{
-			foreach (var data in DataList[0])
-			{
-				Debug.Log (data.ts);
-			}
+//			foreach (var data in DataList[0])
+//			{
+//				Debug.Log (data.ts);
+//			}
 			InitModel ();
 		}
 	}
@@ -392,50 +408,55 @@ public class XMLLoader : MonoBehaviour {
 	void InitModel()
 	{
 		Debug.Log("<color=blue>Copmlete Create 3d Objects</color>");
-		foreach (List<LocationData> List in DataList) {
-			GameObject actor;
-			if (1 <= List.Count) {
+		foreach (List<LocationData> List in DataList)
+		{
+			
+			if (1 <= List.Count)
+			{
+				
 				Vector3 pos = new Vector3 (List [0].posX, (float)0.3, List [0].posZ);
 				Quaternion dir = Quaternion.Euler (0, List [0].angleY, 0);
 				Vector3 tpos = new Vector3 (List [0].posX, (float)1, List [0].posZ);
-				//				Debug.LogWarning("mid"+List[0].mid+" is "+Who(List[0].mid));
-				if (midDic ["mid" + List [0].mid] > MID_CHECK_SKIP_COUNT) {
-					switch (Who (List [0].mid)) {
+				Debug.LogError ("mid" + List [0].mid.ToString ());
+				if (actorDict ["mid" + List [0].mid].counter > MID_CHECK_SKIP_COUNT)
+				{
+					GameObject actor = null;
+					switch (Who (List [0].mid))
+					{
 					case "male":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_MALE), pos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						//						actorList.Add (actor);
 						break;
 					case "female":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_FEMALE), pos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						//						actorList.Add (actor);
 						break;
 					case "teacher":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_MALE_TEACHER), tpos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						//						actorList.Add (actor);
 						break;
 					case "teacher_woman":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_FEMALE_TEACHER), tpos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						//						actorList.Add (actor);
 						break;
 					case "desk":
 						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_DESK), pos, dir) as GameObject;
 						actor.name = "mid" + List [0].mid.ToString ();
-						//						actorList.Add (actor);
 						break;
 					default:
 						break;
 					}
+					if (actorDict ["mid" + List [0].mid].objActor == null)
+						actorDict ["mid" + List [0].mid].objActor = actor;
 				}
 			}
 		}
 
 		//初回処理
-		if (!XMLHasLoad)
+//		if (!XMLHasLoad)
+		if (!XMLHasLoad && packId == packNum)
 		{
+			Debug.LogError ("JsonLoaded");
 			StartCoroutine("Relocate",0.1f);
 			XMLHasLoad = true;
 			time = 0;
@@ -544,41 +565,59 @@ public class XMLLoader : MonoBehaviour {
 	private IEnumerator Relocate(float time)
 	{
 		Debug.Log ("<color=red>Relocate</color>");
-		while(true){
-		foreach (List<LocationData> list in DataList) {
+		while(true)
+		{
+			foreach (List<LocationData> list in DataList)
+			{
 //				Debug.Log ("<color=blue>"+audioTime+"</color>");
 			LocationData Data = getActorLocation(list);
-				if (Data != null) {
+				if (Data != null) 
+				{
 //					Debug.Log ("[" + Data.mid + "]" + list.Count);
-				} else {
+				}
+				else 
+				{
 //					Debug.Log ("null");
 				}
 
-			//二重foreachの見た目を避け可読性をあげると以下の条件分岐が入ってしまうので、関数を使わないほうがいいかも
-			if(1 <= list.Count&&Data!=null){
-					GameObject actor = GameObject.Find("mid"+Data.mid.ToString());
+				//二重foreachの見た目を避け可読性をあげると以下の条件分岐が入ってしまうので、関数を使わないほうがいいかも
+				if(1 <= list.Count&&Data!=null)
+				{
+//					GameObject actor = GameObject.Find("mid"+Data.mid.ToString());
+					GameObject actor = actorDict["mid"+Data.mid].objActor;
 					Vector3 tmpPos = actor.transform.position;
 					Vector3 tmpAngle = new Vector3 (actor.transform.eulerAngles.x, actor.transform.eulerAngles.y, actor.transform.eulerAngles.z);
 
 					Vector3 dataPos = new Vector3 (Data.posX, actor.transform.position.y, Data.posZ);
-					bool isMoveX = Mathf.Abs(tmpPos.x - dataPos.x) > POS_CHECK_SKIP_VALUE;
-					bool isMoveZ = Mathf.Abs(tmpPos.z - dataPos.z) > POS_CHECK_SKIP_VALUE;
-					Vector3 updatePos = isMoveX || isMoveZ ? dataPos : tmpPos;
+
+//					bool isMoveX = Mathf.Abs(tmpPos.x - dataPos.x) > POS_CHECK_SKIP_VALUE;
+//					bool isMoveZ = Mathf.Abs(tmpPos.z - dataPos.z) > POS_CHECK_SKIP_VALUE;
+//					if(!isMoveX && !isMoveZ)
+//						Debug.LogError ("POS_SKIP");
+//					Vector3 updatePos = isMoveX || isMoveZ ? dataPos : tmpPos;
+					Vector3 updatePos = dataPos;
 
 
 
 					//マイナスをプラスにする (ex. -80 => 280
 					Data.angleY =  Data.angleY < 0 ? 360f +Data.angleY : Data.angleY;
-					bool isChangeRot = Mathf.Abs(tmpAngle.y - Data.angleY) > ROT_CHECK_SKIP_VALUE;
-					if(isChangeRot)
-						tmpAngle.y = actor.transform.eulerAngles.y;
+					bool isChangeRotion = Mathf.Abs(tmpAngle.y - Data.angleY) > ROT_CHECK_SKIP_VALUE;
+					if (isChangeRotion)
+					{
+						tmpAngle.y = Data.angleY;
+					}
+					else
+					{
+						Debug.LogError ("ROT_SKIP");
+					}
+					
 
 					//positionとrotation更新
-					actor.transform.position = Vector3.Lerp (actor.transform.position, updatePos,0.7f);
-					actor.transform.eulerAngles = Vector3.Lerp(actor.transform.eulerAngles,tmpAngle,0.5f);
-//					Debug.Log ("<color=red>"+actor.transform.position+"</color>");
+					iTween.MoveTo (actor, updatePos, MOVE_SPEED);
+					iTween.RotateTo (actor,tmpAngle, ROTATION_SPEED);
+
+				}
 			}
-		}
 			yield return new WaitForSeconds(time);
 		}
 	}
@@ -631,7 +670,8 @@ public class XMLLoader : MonoBehaviour {
 
 
 //位置情報のクラス
-public class LocationData{
+public class LocationData
+{
 	public int mid;		//	オブジェクトの識別id
 	public float ts;	//タイムスタンプ
 	public float posX;	//x座標
@@ -639,12 +679,26 @@ public class LocationData{
 	public float angleY;	//yのRotation
 	public int col;
 
-	public LocationData(int getMid,float getTs,float getposX,float getposZ,int getColor,float getrotY){
+	public LocationData(int getMid,float getTs,float getposX,float getposZ,int getColor,float getrotY)
+	{
 		mid = getMid;
 		ts = getTs;
 		posX = getposX;
 		posZ = getposZ;
 		col = getColor;
 		angleY = getrotY;
+	}
+}
+
+//Actorクラス
+public class ActorData
+{
+	public int counter;
+	public GameObject objActor;
+
+	public ActorData(int cnt,GameObject obj)
+	{
+		counter = cnt;
+		objActor = obj;
 	}
 }
