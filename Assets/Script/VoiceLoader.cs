@@ -24,7 +24,7 @@ public class VoiceLoader : MonoBehaviour {
 		if (sid == null || tid == null)
 			yield return null;
 //		WWW www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/300_1.mp3");
-		#if !UNITY_EDITOR && UNITY_WEBGL
+		#if !UNITY_EDITOR
 		www = new WWW("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".mp3");
 		Debug.Log ("http://pb.fm.senshu-u.ac.jp/~tmochi/educeboard/voice/"+sid+"_"+tid+".mp3");
 		#else
@@ -41,9 +41,11 @@ public class VoiceLoader : MonoBehaviour {
 //			Application.ExternalCall("xmlLoadFlag",-1);
 //			SceneManager.LoadScene("LoadScene");
 		}
-		#if !UNITY_EDITOR && UNITY_WEBGL
+		#if !UNITY_EDITOR
+		Debug.LogError("Load:MEPG");
 		source.clip = www.GetAudioClip(true,false,AudioType.MPEG);
 		#else
+		Debug.LogError("Load:OGG");
 		source.clip = www.GetAudioClip(true,false,AudioType.OGGVORBIS);
 		#endif
 		//Debug.Log("DownloadSize:"+www.size/1024/1024+"Mbyte");

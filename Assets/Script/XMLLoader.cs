@@ -166,7 +166,7 @@ public class XMLLoader : MonoBehaviour {
 		Debug.Log("<color=blue>Parse Start</color>");
 		string json = getXML.text;
 		packNum = int.Parse(json);
-		Debug.LogWarning("パック数"+packNum);
+//		Debug.LogWarning("パック数"+packNum);
 //        IList familyList = (IList)Json.Deserialize(json);
 //		var dataList = JsonUtility.FromJson<data>(json);
 //		Debug.Log("<color=green>"+json+"</color>");
@@ -282,7 +282,7 @@ public class XMLLoader : MonoBehaviour {
 	//jsonデータを取りに行く
 	void JsonCheck()
 	{
-		Debug.Log ("packID:"+packId);
+//		Debug.Log ("packID:"+packId);
 			var url = string.Format ("{0}{1}", JsonFilePath, packId.ToString ());
 			StartCoroutine (JsonRequest (url));
 			packId++;
@@ -290,7 +290,7 @@ public class XMLLoader : MonoBehaviour {
 
 	void NextData()
 	{
-		Debug.LogWarning ("packId:"+packId+",PackNum:"+packNum);
+//		Debug.LogWarning ("packId:"+packId+",PackNum:"+packNum);
 		if (packId < packNum)
 		{
 			var url = string.Format ("{0}{1}", JsonFilePath, packId.ToString ());
@@ -349,7 +349,7 @@ public class XMLLoader : MonoBehaviour {
 
 	void transformData(List<table> list)
 	{
-		Debug.LogWarning (list.Count);
+//		Debug.LogWarning (list.Count);
 		foreach (var person in list)
 		{
 			int   mid  = person.mid;
@@ -394,7 +394,7 @@ public class XMLLoader : MonoBehaviour {
 			}
 //			Debug.Log ("<color=red>mid:"+person.mid+",ts:"+person.TS+",PosX:"+person.x+"</color>");
 		}
-		Debug.LogError (DataList.Count);
+//		Debug.LogError (DataList.Count);
 		if (!XMLHasLoad && packId == packNum)
 		{
 //			foreach (var data in DataList[0])
@@ -417,7 +417,7 @@ public class XMLLoader : MonoBehaviour {
 				Vector3 pos = new Vector3 (List [0].posX, (float)0.3, List [0].posZ);
 				Quaternion dir = Quaternion.Euler (0, List [0].angleY, 0);
 				Vector3 tpos = new Vector3 (List [0].posX, (float)1, List [0].posZ);
-				Debug.LogError ("mid" + List [0].mid.ToString ());
+				Debug.Log ("mid" + List [0].mid.ToString ());
 				if (actorDict ["mid" + List [0].mid].counter > MID_CHECK_SKIP_COUNT)
 				{
 					GameObject actor = null;
@@ -495,8 +495,10 @@ public class XMLLoader : MonoBehaviour {
 			break;
 		case STEP.PLAY:
 			time -= Time.deltaTime;
-			audioTime = voiceLoader.GetComponent<AudioSource>().time;
-			Application.ExternalCall("soundPosition",voiceLoader.source.time);
+			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
+			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
+			if (voiceLoader.source.time == voiceLoader.source.clip.length)
+				Debug.LogError ("終了");
 			if(time<=0){
 				Application.ExternalCall("soundPosition",voiceLoader.source.time);
 				//time = 0.5f;
