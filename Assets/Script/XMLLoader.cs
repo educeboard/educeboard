@@ -74,6 +74,7 @@ public class XMLLoader : MonoBehaviour {
 
 	public float time = 0.1f;
 	float audioTime =0;
+	bool isSeekMove = false;
 
 	VoiceLoader voiceLoader;
 	STEP step = STEP.NONE;
@@ -149,7 +150,6 @@ public class XMLLoader : MonoBehaviour {
 		Debug.Log("<color=blue>Load Start</color>");
 		getXML = new WWW (XMLFilePath);
 		Debug.Log("<color=blue>"+XMLFilePath+"</color>");
-//		GetComponent<GUIText>().text = "Loading...";
 		yield return getXML;
 
 		if (!string.IsNullOrEmpty (getXML.error)) {
@@ -166,116 +166,10 @@ public class XMLLoader : MonoBehaviour {
 		Debug.Log("<color=blue>Parse Start</color>");
 		string json = getXML.text;
 		packNum = int.Parse(json);
-//		Debug.LogWarning("パック数"+packNum);
-//        IList familyList = (IList)Json.Deserialize(json);
-//		var dataList = JsonUtility.FromJson<data>(json);
-//		Debug.Log("<color=green>"+json+"</color>");
 
 		this.JsonCheck();
-		 
 
-
-
-
-
-
-
-//		var jsonData = JsonUtility.FromJson<data> (json);
-//
-////		foreach(IDictionary person in familyList){
-//		foreach (var person in jsonData.Items) {
-//			
-////			int   mid  = Convert.ToInt32(person["mid"]);
-////			float ts   = Convert.ToSingle(person["TS"]);
-////			float posx = Convert.ToSingle(person["x"])*(float)0.10;
-////			float posy = 8-Convert.ToSingle(person["y"])*(float)0.10;
-////			float roty = Convert.ToSingle(person["d1"]);
-////			int   col  = Convert.ToInt32(person["status"]);
-//
-//			int   mid  = person.mid;
-//			float ts   = person.TS;
-//			float posx = person.x*(float)0.10;
-//			float posy = person.y*(float)0.10;
-//			float roty = person.d1;
-//			int   col  = person.status;
-//
-////			Debug.Log("<color=green>"+mid+","+ts+","+posx+","+posy+","+roty+","+col+"</color>");
-//
-//
-//			if (!midDic.ContainsKey ("mid" + mid)) {
-//				midDic.Add ("mid" + mid, 1);
-//			} else {
-//				midDic ["mid" + mid] += 1;
-//			}
-//
-//			if (mid >= 1000) {
-//				if (mid - 1000 >= DataList.Count) {
-//					DataList.Add (new List<LocationData> ());
-//				} else {
-////					Debug.Log ("datalistの長さ" + DataList.Count);
-//					DataList [mid - 1001].Add (new LocationData (mid, ts, posx, posy, col, roty));
-//				}
-//			} else {
-//				if (mid >= DataList.Count) {
-//					DataList.Add (new List<LocationData> ());
-//				} else {
-//					DataList [mid].Add (new LocationData (mid, ts, posx, posy, col, roty));
-//				}
-//			}
-//        }
-//
-//		Debug.Log("<color=blue>Parse Complete</color>");
 		#endregion
-
-
-//		#region create 3d objects
-//		Debug.Log("<color=blue>Create 3d Objects</color>");
-//        /*3Dオブジェクトの作成*/
-//		foreach (List<LocationData> List in DataList) {
-//			GameObject actor;
-//			if(1 <= List.Count){
-//				Vector3 pos    = new Vector3(List[0].posX,(float)0.3,List[0].posZ);
-//				Quaternion dir = Quaternion.Euler(0,List[0].angleY,0);
-//				Vector3 tpos = new Vector3(List[0].posX,(float)1,List[0].posZ);
-////				Debug.LogWarning("mid"+List[0].mid+" is "+Who(List[0].mid));
-//				if (midDic ["mid" + List [0].mid] > MID_CHECK_SKIP_COUNT) {
-//					switch (Who (List [0].mid)) {
-//					case "male":
-//						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_MALE), pos, dir) as GameObject;
-//						actor.name = "mid" + List [0].mid.ToString ();
-////						actorList.Add (actor);
-//						break;
-//					case "female":
-//						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_FEMALE), pos, dir) as GameObject;
-//						actor.name = "mid" + List [0].mid.ToString ();
-////						actorList.Add (actor);
-//						break;
-//					case "teacher":
-//						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_MALE_TEACHER), tpos, dir) as GameObject;
-//						actor.name = "mid" + List [0].mid.ToString ();
-////						actorList.Add (actor);
-//						break;
-//					case "teacher_woman":
-//						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_FEMALE_TEACHER), tpos, dir) as GameObject;
-//						actor.name = "mid" + List [0].mid.ToString ();
-////						actorList.Add (actor);
-//						break;
-//					case "desk":
-//						actor = Instantiate (Resources.Load (PREFAB_MODEL_PATH + MODEL_DESK), pos, dir) as GameObject;
-//						actor.name = "mid" + List [0].mid.ToString ();
-////						actorList.Add (actor);
-//						break;
-//					default:
-//						break;
-//					}
-//				}
-//			}
-//			
-//		}
-//		Debug.Log("<color=blue>Copmlete Create 3d Objects</color>");
-//		#endregion
-//		XMLHasLoad = true;
-//		time = 0;
 	}
 
 
@@ -489,29 +383,43 @@ public class XMLLoader : MonoBehaviour {
 			}
 			break;
 		case STEP.READY:
+			#if UNITY_EDITOR
 				if (Input.GetKeyDown (KeyCode.Space)) {
 				playFlag (1);
 				}
+			#endif
 			break;
 		case STEP.PLAY:
 			time -= Time.deltaTime;
 			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
 			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
 			if (voiceLoader.source.time == voiceLoader.source.clip.length)
+			{
 				Debug.LogError ("終了");
-			if(time<=0){
+				Application.ExternalCall ("soundPosition", voiceLoader.source.clip.length);
+			}
+			else if(time<=0)
+			{
 				Application.ExternalCall("soundPosition",voiceLoader.source.time);
 				//time = 0.5f;
 				time = 0.1f;
 			}
+			#if UNITY_EDITOR
 			if (Input.GetKeyDown (KeyCode.Space)) {
 				playFlag (0);
 			}
+			if (Input.GetKeyDown (KeyCode.S)) {
+				isSeekMove = true;
+				StartCoroutine ("waitSeek");
+			}
+			#endif
 			break;
 		case STEP.PAUSE:
+			#if UNITY_EDITOR
 			if (Input.GetKeyDown (KeyCode.Space)) {
 				playFlag (1);
 			}
+			#endif
 			break;
 
 //			if(isStart==0 && isPlay==1){
@@ -544,10 +452,20 @@ public class XMLLoader : MonoBehaviour {
 	
 	void soundPosition(float pos){
 		voiceLoader.GetComponent<AudioSource>().time = pos;
+		isSeekMove = true;
+		StartCoroutine ("waitSeek");
+		Debug.LogError ("seek move");
 	}
 
 	void SetSoundValue(float val){
 		voiceLoader.GetComponent<AudioSource>().volume = val;
+	}
+
+	IEnumerator waitSeek()
+	{
+		yield return new WaitForSeconds (0.1f);
+		isSeekMove = false;
+		Debug.LogError ("seek move completed");
 	}
 
 	#region reloacate
@@ -572,16 +490,7 @@ public class XMLLoader : MonoBehaviour {
 		{
 			foreach (List<LocationData> list in DataList)
 			{
-//				Debug.Log ("<color=blue>"+audioTime+"</color>");
 			LocationData Data = getActorLocation(list);
-				if (Data != null) 
-				{
-//					Debug.Log ("[" + Data.mid + "]" + list.Count);
-				}
-				else 
-				{
-//					Debug.Log ("null");
-				}
 
 				//二重foreachの見た目を避け可読性をあげると以下の条件分岐が入ってしまうので、関数を使わないほうがいいかも
 				if(1 <= list.Count&&Data!=null)
@@ -611,8 +520,16 @@ public class XMLLoader : MonoBehaviour {
 					}
 
 					//positionとrotation更新
-					iTween.MoveTo (actor, updatePos, MOVE_SPEED);
-					iTween.RotateTo (actor,tmpAngle, ROTATION_SPEED);
+					if (isSeekMove)
+					{
+						actor.transform.localPosition = updatePos;
+						actor.transform.localRotation = Quaternion.Euler(tmpAngle);
+					}
+					else
+					{
+						iTween.MoveTo (actor, updatePos, MOVE_SPEED);
+						iTween.RotateTo (actor, tmpAngle, ROTATION_SPEED);
+					}
 
 				}
 			}
