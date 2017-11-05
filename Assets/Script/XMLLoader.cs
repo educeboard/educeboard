@@ -137,10 +137,11 @@ public class XMLLoader : MonoBehaviour {
 	{
 		public int mid;		//	オブジェクトの識別id
 		public float TS;	//タイムスタンプ
-		public float x;	//x座標
-		public float y;	//z座標
+		public float x;		//x座標
+		public float y;		//z座標
 		public float d1;	//yのRotation
-		public int status;
+		public int color;	//0:普通,1:寝る,2:真面目
+		public int status;	// 調整後のTS
 	}
 
 	//位置情報をロードする関数
@@ -311,7 +312,7 @@ public class XMLLoader : MonoBehaviour {
 				Vector3 pos = new Vector3 (List [0].posX, (float)0.3, List [0].posZ);
 				Quaternion dir = Quaternion.Euler (0, List [0].angleY, 0);
 				Vector3 tpos = new Vector3 (List [0].posX, (float)1, List [0].posZ);
-				Debug.Log ("mid" + List [0].mid.ToString ());
+//				Debug.Log ("mid" + List [0].mid.ToString ());
 				if (actorDict ["mid" + List [0].mid].counter > MID_CHECK_SKIP_COUNT)
 				{
 					GameObject actor = null;
@@ -340,8 +341,11 @@ public class XMLLoader : MonoBehaviour {
 					default:
 						break;
 					}
-					if (actorDict ["mid" + List [0].mid].objActor == null)
+
+					if (actorDict ["mid" + List [0].mid].objActor == null) {
 						actorDict ["mid" + List [0].mid].objActor = actor;
+						actorDict ["mid" + List [0].mid].controller = actor.GetComponent<ModelController> ();
+					}
 				}
 			}
 		}
@@ -463,7 +467,7 @@ public class XMLLoader : MonoBehaviour {
 
 	IEnumerator waitSeek()
 	{
-		yield return new WaitForSeconds (0.1f);
+		yield return new WaitForSeconds (1.5f);
 		isSeekMove = false;
 		Debug.LogError ("seek move completed");
 	}
@@ -530,6 +534,11 @@ public class XMLLoader : MonoBehaviour {
 						iTween.MoveTo (actor, updatePos, MOVE_SPEED);
 						iTween.RotateTo (actor, tmpAngle, ROTATION_SPEED);
 					}
+
+					if (Data.col == 0 && actorDict ["mid" + Data.mid].controller != null)
+					{
+						actorDict ["mid" + Data.mid].controller.ChangeStatus (Data.col);
+					} 
 
 				}
 			}
@@ -610,6 +619,7 @@ public class ActorData
 {
 	public int counter;
 	public GameObject objActor;
+	public ModelController controller;
 
 	public ActorData(int cnt,GameObject obj)
 	{
