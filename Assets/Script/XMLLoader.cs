@@ -401,6 +401,7 @@ public class XMLLoader : MonoBehaviour {
 			{
 				Debug.LogError ("終了");
 				Application.ExternalCall ("soundPosition", voiceLoader.source.clip.length);
+				playFlag (0);
 			}
 			else if(time<=0)
 			{
