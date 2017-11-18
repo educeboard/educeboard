@@ -11,6 +11,9 @@ public class ModelController : MonoBehaviour {
 	[SerializeField]
 	GameObject [] particles;
 
+	[SerializeField]
+	GameObject [] faces;
+
 	void Start()
 	{
 		this.Initialize ();
@@ -36,5 +39,11 @@ public class ModelController : MonoBehaviour {
 		{
 			particles [i].SetActive (status-1 == i);
 		}
+
+		for (int i = 0; i < faces.Length; i++)
+		{
+			faces [i].SetActive (status == i);
+		}
+
 	}
 }
