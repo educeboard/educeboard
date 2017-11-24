@@ -401,8 +401,8 @@ public class XMLLoader : MonoBehaviour {
 			if (voiceLoader.source.time == voiceLoader.source.clip.length)
 			{
 				Debug.Log ("再生終了");
+				endFlag ();
 //				Application.ExternalCall ("soundPosition", voiceLoader.source.clip.length);
-				playFlag (0);
 			}
 			else if(time<=0)
 			{
@@ -454,6 +454,12 @@ public class XMLLoader : MonoBehaviour {
 			
 		}
 		Debug.Log ("playFlag:"+flag+",step:"+step);
+	}
+
+	void endFlag()
+	{
+		playFlag (0);
+		Application.ExternalCall ("endFlag", 0);
 	}
 	
 	void soundPosition(float pos){
