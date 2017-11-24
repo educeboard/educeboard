@@ -252,7 +252,8 @@ public class XMLLoader : MonoBehaviour {
 			float posx = person.x*(float)0.10;
 			float posy = person.y*(float)0.10;
 			float roty = person.d1;
-			int   col  = person.status;
+			int   col  = person.color;
+			Debug.LogError (col);
 
 			if (!actorDict.ContainsKey ("mid" + mid))
 			{
@@ -536,8 +537,8 @@ public class XMLLoader : MonoBehaviour {
 						iTween.MoveTo (actor, updatePos, MOVE_SPEED);
 						iTween.RotateTo (actor, tmpAngle, ROTATION_SPEED);
 					}
-
-					if (Data.col == 0 && actorDict ["mid" + Data.mid].controller != null)
+						
+					if (actorDict ["mid" + Data.mid].controller != null)
 					{
 						actorDict ["mid" + Data.mid].controller.ChangeStatus (Data.col);
 					} 

@@ -34,10 +34,15 @@ public class IDGetter : MonoBehaviour {
 //			sid = "361943"; // 中馬さん
 //			sid = "361944"; // 香田さん
 //			sid = "361957";	// 木本さん
-			sid = "361958";
+//			sid = "361958";
 //			sid = "362169";
+			sid = "362173";
+//			sid = "362175";
 
+
+			// pass hoge1234
 			tid = "1";
+//			tid = "6";
 		}
 
 	}
