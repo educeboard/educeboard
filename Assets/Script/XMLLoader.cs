@@ -399,8 +399,8 @@ public class XMLLoader : MonoBehaviour {
 			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
 			if (voiceLoader.source.time == voiceLoader.source.clip.length)
 			{
-				Debug.LogError ("終了");
-				Application.ExternalCall ("soundPosition", voiceLoader.source.clip.length);
+				Debug.Log ("再生終了");
+//				Application.ExternalCall ("soundPosition", voiceLoader.source.clip.length);
 				playFlag (0);
 			}
 			else if(time<=0)
@@ -459,18 +459,19 @@ public class XMLLoader : MonoBehaviour {
 		voiceLoader.GetComponent<AudioSource>().time = pos;
 		isSeekMove = true;
 		StartCoroutine ("waitSeek");
-		Debug.LogError ("seek move");
+		Debug.Log ("<JS側からの制御> soundPosition:"+pos);
 	}
 
 	void SetSoundValue(float val){
 		voiceLoader.GetComponent<AudioSource>().volume = val;
+		Debug.Log ("<JS側からの制御> SetSoundValue:"+val);
 	}
 
 	IEnumerator waitSeek()
 	{
 		yield return new WaitForSeconds (1.5f);
 		isSeekMove = false;
-		Debug.LogError ("seek move completed");
+		Debug.Log ("seek move completed");
 	}
 
 	#region reloacate
