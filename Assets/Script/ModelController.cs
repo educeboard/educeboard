@@ -35,6 +35,8 @@ public class ModelController : MonoBehaviour {
 	{
 		if (status < 0) return;
 
+		if (particles.Length == 0 || faces.Length == 0) return;
+
 		for (int i = 0; i < particles.Length; i++)
 		{
 			particles [i].SetActive (status-1 == i);
@@ -44,6 +46,22 @@ public class ModelController : MonoBehaviour {
 		{
 			faces [i].SetActive (status == i);
 		}
+	}
 
+	public void ResetStatus()
+	{
+		if (particles.Length == 0) return;
+
+		for (int i = 0; i < particles.Length; i++)
+		{
+			particles [i].SetActive (false);
+		}
+
+		if (faces.Length == 0) return;
+
+		for (int i = 0; i < faces.Length; i++)
+		{
+			faces [i].SetActive (i == 0);
+		}
 	}
 }

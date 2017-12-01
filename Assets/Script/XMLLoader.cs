@@ -253,7 +253,7 @@ public class XMLLoader : MonoBehaviour {
 			float posy = person.y*(float)0.10;
 			float roty = person.d1;
 			int   col  = person.color;
-			Debug.LogError (col);
+//			Debug.LogError (col);
 
 			if (!actorDict.ContainsKey ("mid" + mid))
 			{
@@ -398,9 +398,15 @@ public class XMLLoader : MonoBehaviour {
 			time -= Time.deltaTime;
 			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
 			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
-			if (voiceLoader.source.time == voiceLoader.source.clip.length)
+			Debug.Log ("soundpos確認:"+voiceLoader.source.time +":"+voiceLoader.source.clip.length);
+			if (audioTime >= voiceLoader.source.clip.length)
 			{
 				Debug.Log ("再生終了");
+				foreach(var data in actorDict.Values)
+				{
+					if(data.controller != null)
+						data.controller.ResetStatus ();
+				}
 				endFlag ();
 //				Application.ExternalCall ("soundPosition", voiceLoader.source.clip.length);
 			}
@@ -458,8 +464,9 @@ public class XMLLoader : MonoBehaviour {
 
 	void endFlag()
 	{
-		playFlag (0);
 		Application.ExternalCall ("endFlag", 0);
+		Debug.Log ("called endFlag!");
+		playFlag (0);
 	}
 	
 	void soundPosition(float pos){
