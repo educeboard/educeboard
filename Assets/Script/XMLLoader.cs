@@ -397,11 +397,12 @@ public class XMLLoader : MonoBehaviour {
 		case STEP.PLAY:
 			time -= Time.deltaTime;
 			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
+
+			Debug.Log ("SourceTime:"+voiceLoader.source.time +",ClipLength:"+voiceLoader.source.clip.length +",AudioTime:"+audioTime);
 			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
-			Debug.Log ("soundpos確認:"+voiceLoader.source.time +":"+voiceLoader.source.clip.length);
-			if (audioTime >= voiceLoader.source.clip.length)
+			if ((int)this.voiceLoader.source.time >= (int)voiceLoader.source.clip.length)
 			{
-				Debug.Log ("再生終了");
+				Debug.LogError ("再生終了");
 				foreach(var data in actorDict.Values)
 				{
 					if(data.controller != null)
@@ -412,17 +413,18 @@ public class XMLLoader : MonoBehaviour {
 			}
 			else if(time<=0)
 			{
-				Application.ExternalCall("soundPosition",voiceLoader.source.time);
+				Debug.Log ("timeFix");
 				//time = 0.5f;
 				time = 0.1f;
 			}
+
 			#if UNITY_EDITOR
 			if (Input.GetKeyDown (KeyCode.Space)) {
 				playFlag (0);
 			}
 			if (Input.GetKeyDown (KeyCode.S)) {
 				isSeekMove = true;
-				StartCoroutine ("waitSeek");
+				DebugReset();
 			}
 			#endif
 			break;
@@ -448,12 +450,14 @@ public class XMLLoader : MonoBehaviour {
 	void playFlag(int flag){
 		if (flag == 1 && step == STEP.READY ||flag == 1 && step == STEP.PAUSE) {
 			step = STEP.PLAY;
+			isSeekMove = false;
 //			GetComponent<GUIText>().text = "Now playing";
 			voiceLoader.GetComponent<AudioSource>().time = audioTime;
 			voiceLoader.GetComponent<AudioSource>().Play ();
 		}else if(flag ==0){
 //			isPlay = 0;
 			step = STEP.PAUSE;
+			isSeekMove = true;
 			voiceLoader.GetComponent<AudioSource>().Pause();
 			audioTime =voiceLoader.GetComponent<AudioSource>().time;
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
@@ -470,6 +474,7 @@ public class XMLLoader : MonoBehaviour {
 	}
 	
 	void soundPosition(float pos){
+		audioTime = pos;
 		voiceLoader.GetComponent<AudioSource>().time = pos;
 		isSeekMove = true;
 		StartCoroutine ("waitSeek");
@@ -479,6 +484,12 @@ public class XMLLoader : MonoBehaviour {
 	void SetSoundValue(float val){
 		voiceLoader.GetComponent<AudioSource>().volume = val;
 		Debug.Log ("<JS側からの制御> SetSoundValue:"+val);
+	}
+
+	void DebugReset()
+	{
+		soundPosition (0.0f);
+		playFlag (1);
 	}
 
 	IEnumerator waitSeek()
