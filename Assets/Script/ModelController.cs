@@ -6,7 +6,18 @@ using System.Collections;
 public class ModelController : MonoBehaviour {
 	[SerializeField]
 	Camera camera;
+	[SerializeField]
+	Transform cameraRoot;
 	int camId;
+
+	private float angleSpeed = 0.25f;
+	private float heightSpeed = 0.1f;
+
+	private Vector3 initialCameraAngle = new Vector3 ();
+	private Vector3 newAngle = new Vector3 ();
+
+	private Vector3 initialCameraPos = new Vector3 ();
+	private Vector3 newCameraPos = new Vector3 ();
 
 	[SerializeField]
 	GameObject [] particles;
@@ -19,10 +30,55 @@ public class ModelController : MonoBehaviour {
 		this.Initialize ();
 	}
 
+	void Update()
+	{
+		if (!this.camera.enabled)
+			return;
+		
+		if (Input.GetKey (KeyCode.LeftArrow))
+		{
+			Debug.LogError ("left");
+			this.newAngle.y -= angleSpeed;
+//			this.camera.gameObject.transform.localEulerAngles = newAngle;
+			this.cameraRoot.localEulerAngles = newAngle;
+		}
+		if (Input.GetKey (KeyCode.RightArrow))
+		{
+			Debug.LogError ("right");
+			this.newAngle.y += angleSpeed;
+//			this.camera.gameObject.transform.localEulerAngles = newAngle;
+			this.cameraRoot.localEulerAngles = newAngle;
+		}
+		if (Input.GetKey (KeyCode.UpArrow))
+		{
+			if (this.newCameraPos.y > 3.5f)
+				return;
+			this.newCameraPos.y += heightSpeed;
+//			this.camera.gameObject.transform.localPosition = newCameraPos;
+			this.cameraRoot.localPosition = newCameraPos;
+		}
+		if (Input.GetKey (KeyCode.DownArrow))
+		{
+			if (this.newCameraPos.y < 2f)
+				return;
+			this.newCameraPos.y -= heightSpeed;
+//			this.camera.gameObject.transform.localPosition = newCameraPos;
+			this.cameraRoot.localPosition = newCameraPos;
+		}
+		if (Input.GetKeyDown (KeyCode.R))
+		{
+			ResetCameraPos ();
+		}
+	}
+
 	// 初期化処理
 	void Initialize()
 	{
 		this.camId = EBManager.instance.AddCamera (this.camera);
+		this.initialCameraAngle = this.cameraRoot.localEulerAngles;
+		this.newAngle = this.initialCameraAngle;
+		this.initialCameraPos = this.cameraRoot.localPosition;
+		this.newCameraPos = this.initialCameraPos;
 	}
 
 	void OnMouseDown()
@@ -63,5 +119,14 @@ public class ModelController : MonoBehaviour {
 		{
 			faces [i].SetActive (i == 0);
 		}
+	}
+
+	private void ResetCameraPos()
+	{
+		this.cameraRoot.localEulerAngles = initialCameraAngle;
+		newAngle = initialCameraAngle;
+
+		this.cameraRoot.localPosition = initialCameraPos;
+		newCameraPos = initialCameraPos;
 	}
 }

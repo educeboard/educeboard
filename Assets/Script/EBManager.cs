@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
 public class EBManager : MonoBehaviour {
 	public static EBManager instance
@@ -45,23 +46,20 @@ public class EBManager : MonoBehaviour {
 		BtnCameraChange.onClick.AddListener (ChangePublicMode);
 
 	}
-		
-//	public  void FuncChangeCameraMode()
-//	{
-//		if (isPrivateMode)
-//		{
-//			isReSet = true;
-//			BtnCameraChange.gameObject.SetActive (false);
-//			isPrivateMode = false;
-//		}
-//		else
-//		{
-//			isPrivateMode = true;
-//			BtnCameraChange.gameObject.SetActive (true);
-//		}
-//	}
+
+	void Update()
+	{
+		//! privateカメラモード脱出用
+		if (Input.GetKeyDown (KeyCode.Escape) && isPrivateMode)
+			ChangePublicMode ();
 
 
+		if (Input.GetKeyDown (KeyCode.Return))
+		{
+			ChangeNextCamera ();
+		}
+			
+	}
 
 	public void AddPublicCamera(Camera cam)
 	{
@@ -77,12 +75,15 @@ public class EBManager : MonoBehaviour {
 
 	public void ChangePrivateMode(int camId)
 	{
+		Debug.LogError (camId);
+		
 		privateCamDic [camId].enabled = true;
 		if(activeCameraId != 0 && activeCameraId != camId )
 			privateCamDic [activeCameraId].enabled = false;
 		activeCameraId = camId;
 		if(!BtnCameraChange.gameObject.activeSelf)
-			BtnCameraChange.gameObject.SetActive (true);
+//			BtnCameraChange.gameObject.SetActive (true);
+		isPrivateMode = true;
 	}
 
 	public void ChangePublicMode()
@@ -96,5 +97,42 @@ public class EBManager : MonoBehaviour {
 			cam.enabled = false;
 		}
 		BtnCameraChange.gameObject.SetActive (false);
+		isPrivateMode = false;
 	}
+		
+	public void SetInitialCameta()
+	{
+		if (privateCamDic == null)
+			return;
+		
+		//! 初回のカメラ設定
+		ChangePrivateMode (privateCamDic.Keys.Last ());
+	}
+
+	private void ChangeNextCamera()
+	{
+		
+		int nextCamId = activeCameraId;
+		Debug.LogError (activeCameraId);
+		if (nextCamId >= privateCamDic.Keys.Last ())
+		{
+			nextCamId = privateCamDic.Keys.First ();
+		}
+		else
+		{
+			nextCamId++;
+		}
+		ChangePrivateMode (nextCamId);
+	}
+
+	private int GetActiveCameraId()
+	{
+		foreach (var id in privateCamDic.Keys)
+		{
+			if (privateCamDic [id].enabled == true)
+				return id;
+		}
+		return 0;
+	}
+
 }

@@ -384,6 +384,7 @@ public class XMLLoader : MonoBehaviour {
 				step = STEP.READY;
 				Application.ExternalCall("xmlLoadFlag",1);
 				Debug.Log ("Ready");
+				EBManager.instance.SetInitialCameta ();
 
 			}
 			break;
@@ -396,7 +397,7 @@ public class XMLLoader : MonoBehaviour {
 			break;
 		case STEP.PLAY:
 			time -= Time.deltaTime;
-			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
+//			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
 
 			Debug.Log ("SourceTime:"+voiceLoader.source.time +",ClipLength:"+voiceLoader.source.clip.length +",AudioTime:"+audioTime);
 			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
@@ -452,7 +453,10 @@ public class XMLLoader : MonoBehaviour {
 			step = STEP.PLAY;
 			isSeekMove = false;
 //			GetComponent<GUIText>().text = "Now playing";
+            Debug.LogError("start1:" +voiceLoader.GetComponent<AudioSource>().time );
 			voiceLoader.GetComponent<AudioSource>().time = audioTime;
+
+            Debug.LogError("start2:"+audioTime);
 			voiceLoader.GetComponent<AudioSource>().Play ();
 		}else if(flag ==0){
 //			isPlay = 0;
@@ -460,6 +464,7 @@ public class XMLLoader : MonoBehaviour {
 			isSeekMove = true;
 			voiceLoader.GetComponent<AudioSource>().Pause();
 			audioTime =voiceLoader.GetComponent<AudioSource>().time;
+            Debug.LogError("stop:" + audioTime);
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
 			
 		}

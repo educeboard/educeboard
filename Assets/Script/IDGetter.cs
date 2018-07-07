@@ -37,8 +37,9 @@ public class IDGetter : MonoBehaviour {
 //			sid = "361958";
 //			sid = "362169";
 //			sid = "362173";
-			sid = "362228";
+//			sid = "362228";
 //			sid = "362175";
+            sid = "362294";
 
 
 			// pass hoge1234
