@@ -37,14 +37,14 @@ public class ModelController : MonoBehaviour {
 		
 		if (Input.GetKey (KeyCode.LeftArrow))
 		{
-			Debug.LogError ("left");
+//			Debug.LogError ("left");
 			this.newAngle.y -= angleSpeed;
 //			this.camera.gameObject.transform.localEulerAngles = newAngle;
 			this.cameraRoot.localEulerAngles = newAngle;
 		}
 		if (Input.GetKey (KeyCode.RightArrow))
 		{
-			Debug.LogError ("right");
+//			Debug.LogError ("right");
 			this.newAngle.y += angleSpeed;
 //			this.camera.gameObject.transform.localEulerAngles = newAngle;
 			this.cameraRoot.localEulerAngles = newAngle;

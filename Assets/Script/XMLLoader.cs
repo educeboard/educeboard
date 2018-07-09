@@ -85,7 +85,7 @@ public class XMLLoader : MonoBehaviour {
 
 
 		#if !UNITY_EDITOR && UNITY_WEBGL
-		WebGLInput.captureAllKeyboardInput = false;
+//		WebGLInput.captureAllKeyboardInput = false;
 		#endif
 		if (string.IsNullOrEmpty (IDGetter.sid) || string.IsNullOrEmpty (IDGetter.tid)) {
 			Debug.Log ("<color=red>[ID Error]:sid or tid is null. move to LoadScene</color>");
@@ -385,6 +385,10 @@ public class XMLLoader : MonoBehaviour {
 				Application.ExternalCall("xmlLoadFlag",1);
 				Debug.Log ("Ready");
 				EBManager.instance.SetInitialCameta ();
+				#if !UNITY_EDITOR && UNITY_WEBGL
+						WebGLInput.captureAllKeyboardInput = true;
+				Debug.Log ("KeyBoardInput:"+WebGLInput.captureAllKeyboardInput);
+				#endif
 
 			}
 			break;
@@ -449,26 +453,29 @@ public class XMLLoader : MonoBehaviour {
 	}
 
 	void playFlag(int flag){
+		Debug.Log ("IN:playFlag:"+flag+",step:"+step);
 		if (flag == 1 && step == STEP.READY ||flag == 1 && step == STEP.PAUSE) {
 			step = STEP.PLAY;
 			isSeekMove = false;
 //			GetComponent<GUIText>().text = "Now playing";
-            Debug.LogError("start1:" +voiceLoader.GetComponent<AudioSource>().time );
-			voiceLoader.GetComponent<AudioSource>().time = audioTime;
-
-            Debug.LogError("start2:"+audioTime);
-			voiceLoader.GetComponent<AudioSource>().Play ();
+			Debug.LogError("start1:" +voiceLoader.source.time );
+			Debug.LogError("audioTime:"+audioTime);
+			voiceLoader.source.time = audioTime;
+			Debug.LogError("start2:" +voiceLoader.source.time );
+            
+			voiceLoader.source.Play ();
 		}else if(flag ==0){
 //			isPlay = 0;
 			step = STEP.PAUSE;
 			isSeekMove = true;
-			voiceLoader.GetComponent<AudioSource>().Pause();
-			audioTime =voiceLoader.GetComponent<AudioSource>().time;
-            Debug.LogError("stop:" + audioTime);
+			voiceLoader.source.Pause ();
+			Debug.LogError("stop:" +voiceLoader.source.time );
+			audioTime =voiceLoader.source.time;
+            Debug.LogError("stopAudioTime:" + audioTime);
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
 			
 		}
-		Debug.Log ("playFlag:"+flag+",step:"+step);
+		Debug.Log ("Out:playFlag:"+flag+",step:"+step);
 	}
 
 	void endFlag()
@@ -480,14 +487,14 @@ public class XMLLoader : MonoBehaviour {
 	
 	void soundPosition(float pos){
 		audioTime = pos;
-		voiceLoader.GetComponent<AudioSource>().time = pos;
+		voiceLoader.source.time = pos;
 		isSeekMove = true;
 		StartCoroutine ("waitSeek");
 		Debug.Log ("<JS側からの制御> soundPosition:"+pos);
 	}
 
 	void SetSoundValue(float val){
-		voiceLoader.GetComponent<AudioSource>().volume = val;
+		voiceLoader.source.volume = val;
 		Debug.Log ("<JS側からの制御> SetSoundValue:"+val);
 	}
 
