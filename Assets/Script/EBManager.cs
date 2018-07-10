@@ -102,7 +102,7 @@ public class EBManager : MonoBehaviour {
 		
 	public void SetInitialCameta()
 	{
-		if (privateCamDic == null)
+		if (privateCamDic == null || privateCamDic.Count == 0)
 			return;
 		
 		//! 初回のカメラ設定
