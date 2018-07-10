@@ -385,10 +385,7 @@ public class XMLLoader : MonoBehaviour {
 				Application.ExternalCall("xmlLoadFlag",1);
 				Debug.Log ("Ready");
 				EBManager.instance.SetInitialCameta ();
-				#if !UNITY_EDITOR && UNITY_WEBGL
-						WebGLInput.captureAllKeyboardInput = true;
-				Debug.Log ("KeyBoardInput:"+WebGLInput.captureAllKeyboardInput);
-				#endif
+				ChangeKeyBoardInput (true);
 
 			}
 			break;
@@ -460,7 +457,7 @@ public class XMLLoader : MonoBehaviour {
 //			GetComponent<GUIText>().text = "Now playing";
 			Debug.LogError("start1:" +voiceLoader.source.time );
 			Debug.LogError("audioTime:"+audioTime);
-			voiceLoader.source.time = audioTime;
+//			voiceLoader.source.time = audioTime;
 			Debug.LogError("start2:" +voiceLoader.source.time );
             
 			voiceLoader.source.Play ();
@@ -496,6 +493,14 @@ public class XMLLoader : MonoBehaviour {
 	void SetSoundValue(float val){
 		voiceLoader.source.volume = val;
 		Debug.Log ("<JS側からの制御> SetSoundValue:"+val);
+	}
+
+	void ChangeKeyBoardInput(bool isUse)
+	{
+		#if !UNITY_EDITOR && UNITY_WEBGL
+		WebGLInput.captureAllKeyboardInput = isUse;
+		Debug.Log ("KeyBoardInput:"+WebGLInput.captureAllKeyboardInput);
+		#endif
 	}
 
 	void DebugReset()

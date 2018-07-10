@@ -49,6 +49,9 @@ public class EBManager : MonoBehaviour {
 
 	void Update()
 	{
+		if (privateCamDic.Count == 0)
+			return;
+
 		//! privateカメラモード脱出用
 		if (Input.GetKeyDown (KeyCode.Escape) && isPrivateMode)
 			ChangePublicMode ();
@@ -113,7 +116,6 @@ public class EBManager : MonoBehaviour {
 	{
 		
 		int nextCamId = activeCameraId;
-		Debug.LogError (activeCameraId);
 		if (nextCamId >= privateCamDic.Keys.Last ())
 		{
 			nextCamId = privateCamDic.Keys.First ();
