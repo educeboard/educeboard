@@ -398,9 +398,10 @@ public class XMLLoader : MonoBehaviour {
 			break;
 		case STEP.PLAY:
 			time -= Time.deltaTime;
-//			audioTime = voiceLoader.GetComponent<AudioSource> ().time;
+			Debug.LogWarning (voiceLoader.source.time);
+			audioTime = voiceLoader.source.time;
 
-			Debug.Log ("SourceTime:"+voiceLoader.source.time +",ClipLength:"+voiceLoader.source.clip.length +",AudioTime:"+audioTime);
+//			Debug.Log ("SourceTime:"+voiceLoader.source.time +",ClipLength:"+voiceLoader.source.clip.length +",AudioTime:"+audioTime);
 			Application.ExternalCall ("soundPosition", voiceLoader.source.time);
 			if ((int)this.voiceLoader.source.time >= (int)voiceLoader.source.clip.length)
 			{
@@ -452,20 +453,25 @@ public class XMLLoader : MonoBehaviour {
 	void playFlag(int flag){
 		Debug.Log ("IN:playFlag:"+flag+",step:"+step);
 		if (flag == 1 && step == STEP.READY ||flag == 1 && step == STEP.PAUSE) {
-			step = STEP.PLAY;
-			isSeekMove = false;
+			ChangeKeyBoardInput (true);
 //			GetComponent<GUIText>().text = "Now playing";
 			Debug.LogError("start1:" +voiceLoader.source.time );
+			Debug.Log ("GETCOMPONENT1:"+voiceLoader.GetComponent<AudioSource> ().time);
 			Debug.LogError("audioTime:"+audioTime);
-//			voiceLoader.source.time = audioTime;
+			voiceLoader.source.time = audioTime;
 			Debug.LogError("start2:" +voiceLoader.source.time );
-            
+			Debug.Log ("GETCOMPONENT2:"+voiceLoader.GetComponent<AudioSource> ().time);
 			voiceLoader.source.Play ();
+//			voiceLoader.source.UnPause ();
+			step = STEP.PLAY;
+			isSeekMove = false;
 		}else if(flag ==0){
+			ChangeKeyBoardInput (false);
 //			isPlay = 0;
 			step = STEP.PAUSE;
 			isSeekMove = true;
-			voiceLoader.source.Pause ();
+//			voiceLoader.source.Pause ();
+			voiceLoader.source.Stop ();
 			Debug.LogError("stop:" +voiceLoader.source.time );
 			audioTime =voiceLoader.source.time;
             Debug.LogError("stopAudioTime:" + audioTime);
@@ -485,6 +491,7 @@ public class XMLLoader : MonoBehaviour {
 	void soundPosition(float pos){
 		audioTime = pos;
 		voiceLoader.source.time = pos;
+		Debug.LogError ("setsoudpos:"+voiceLoader.source.time);
 		isSeekMove = true;
 		StartCoroutine ("waitSeek");
 		Debug.Log ("<JS側からの制御> soundPosition:"+pos);
@@ -511,7 +518,7 @@ public class XMLLoader : MonoBehaviour {
 
 	IEnumerator waitSeek()
 	{
-		yield return new WaitForSeconds (1.5f);
+		yield return new WaitForSeconds (0.5f);
 		isSeekMove = false;
 		Debug.Log ("seek move completed");
 	}
