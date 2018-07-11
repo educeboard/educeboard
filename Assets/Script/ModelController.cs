@@ -10,13 +10,22 @@ public class ModelController : MonoBehaviour {
 	Transform cameraRoot;
 	int camId;
 
-	private float angleSpeed = 0.25f;
+	private float angleSpeed = 0.5f;
 	private float heightSpeed = 0.1f;
 
+	//! キャラクター初期化用Position
+	private Vector3 StartPos = new Vector3 ();
+	//! キャラクター初期化用Angle
+	private Vector3 StartAngle = new Vector3 ();
+
+	//! カメラの初期化用Angle
 	private Vector3 initialCameraAngle = new Vector3 ();
+	//! カメラの調整用Angle
 	private Vector3 newAngle = new Vector3 ();
 
+	//! カメラの初期化用Position
 	private Vector3 initialCameraPos = new Vector3 ();
+	//! カメラの調整用Position
 	private Vector3 newCameraPos = new Vector3 ();
 
 	[SerializeField]
@@ -74,13 +83,20 @@ public class ModelController : MonoBehaviour {
 	// 初期化処理
 	void Initialize()
 	{
+		//! カメラをマネージャーに登録
 		this.camId = EBManager.instance.AddCamera (this.camera);
+		//! カメラアングル初期化用
 		this.initialCameraAngle = this.cameraRoot.localEulerAngles;
 		this.newAngle = this.initialCameraAngle;
+		//! カメラポジション初期化用
 		this.initialCameraPos = this.cameraRoot.localPosition;
 		this.newCameraPos = this.initialCameraPos;
+		//! キャラクター初期化用
+		this.StartPos = this.gameObject.transform.localPosition;
+		this.StartAngle = this.gameObject.transform.localEulerAngles;
 	}
 
+	//! クリックされたら視点切り替え
 	void OnMouseDown()
 	{
 		EBManager.instance.ChangePrivateMode (this.camId);
@@ -104,6 +120,7 @@ public class ModelController : MonoBehaviour {
 		}
 	}
 
+	//! ステータスを初期化
 	public void ResetStatus()
 	{
 		if (particles.Length == 0) return;
@@ -121,6 +138,14 @@ public class ModelController : MonoBehaviour {
 		}
 	}
 
+	public void ResetStartPos()
+	{
+		this.gameObject.transform.localPosition = this.StartPos;
+		this.gameObject.transform.localEulerAngles = this.StartAngle;
+		ResetStatus ();
+	}
+
+	//! カメラのPositionとAngleを初期化
 	private void ResetCameraPos()
 	{
 		this.cameraRoot.localEulerAngles = initialCameraAngle;

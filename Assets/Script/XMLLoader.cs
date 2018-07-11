@@ -398,7 +398,7 @@ public class XMLLoader : MonoBehaviour {
 			break;
 		case STEP.PLAY:
 			time -= Time.deltaTime;
-			Debug.LogWarning (voiceLoader.source.time);
+//			Debug.LogWarning (voiceLoader.source.time);
 			audioTime = voiceLoader.source.time;
 
 //			Debug.Log ("SourceTime:"+voiceLoader.source.time +",ClipLength:"+voiceLoader.source.clip.length +",AudioTime:"+audioTime);
@@ -451,16 +451,13 @@ public class XMLLoader : MonoBehaviour {
 	}
 
 	void playFlag(int flag){
-		Debug.Log ("IN:playFlag:"+flag+",step:"+step);
+//		Debug.Log ("IN:playFlag:"+flag+",step:"+step);
 		if (flag == 1 && step == STEP.READY ||flag == 1 && step == STEP.PAUSE) {
 			ChangeKeyBoardInput (true);
-//			GetComponent<GUIText>().text = "Now playing";
 			Debug.LogError("start1:" +voiceLoader.source.time );
-			Debug.Log ("GETCOMPONENT1:"+voiceLoader.GetComponent<AudioSource> ().time);
 			Debug.LogError("audioTime:"+audioTime);
 			voiceLoader.source.time = audioTime;
 			Debug.LogError("start2:" +voiceLoader.source.time );
-			Debug.Log ("GETCOMPONENT2:"+voiceLoader.GetComponent<AudioSource> ().time);
 			voiceLoader.source.Play ();
 //			voiceLoader.source.UnPause ();
 			step = STEP.PLAY;
@@ -470,15 +467,24 @@ public class XMLLoader : MonoBehaviour {
 //			isPlay = 0;
 			step = STEP.PAUSE;
 			isSeekMove = true;
+//			
+			//! パーティクルの停止
+			foreach(var data in actorDict.Values)
+			{
+				if(data.controller != null)
+					data.controller.ResetStatus ();
+			}
+
 //			voiceLoader.source.Pause ();
 			voiceLoader.source.Stop ();
+
 			Debug.LogError("stop:" +voiceLoader.source.time );
 			audioTime =voiceLoader.source.time;
             Debug.LogError("stopAudioTime:" + audioTime);
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
 			
 		}
-		Debug.Log ("Out:playFlag:"+flag+",step:"+step);
+//		Debug.Log ("Out:playFlag:"+flag+",step:"+step);
 	}
 
 	void endFlag()
