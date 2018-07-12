@@ -476,10 +476,11 @@ public class XMLLoader : MonoBehaviour {
 			}
 
 //			voiceLoader.source.Pause ();
+			audioTime =voiceLoader.source.time;
 			voiceLoader.source.Stop ();
 
 			Debug.LogError("stop:" +voiceLoader.source.time );
-			audioTime =voiceLoader.source.time;
+//			audioTime =voiceLoader.source.time;
             Debug.LogError("stopAudioTime:" + audioTime);
 			//Debug.Log(voiceLoader.GetComponent<AudioSource>().time);
 			
